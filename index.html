@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="긴 녹음 파일(m4a·mp3 등)에서 노래 구간만 자동으로 찾아 곡별로 잘라 저장합니다. 파일은 기기 밖으로 나가지 않아요.">
+<title>노래만 잘라주는 가위 · LMAO</title>
+<style>
+:root{color-scheme:light dark;--bg:#fafafa;--fg:#1a1a1a;--card:#fff;--muted:#666;--accent:#6c5ce7}
+@media(prefers-color-scheme:dark){:root{--bg:#141414;--fg:#f2f2f2;--card:#1e1e1e;--muted:#aaa}}
+*{box-sizing:border-box}body{margin:0;line-height:1.6;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;display:flex;min-height:100vh;flex-direction:column;align-items:center}
+main{width:min(720px,94vw);margin:32px auto;flex:1}
+.card{background:var(--card);border:1px solid rgba(0,0,0,.08);border-radius:16px;padding:28px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.06)}
+h1{font-size:1.6rem;margin:0 0 8px}p.sub{color:var(--muted);margin:0 0 20px}
+button{font:inherit;font-size:1.05rem;padding:12px 20px;border-radius:12px;border:1px solid rgba(0,0,0,.12);background:var(--accent);color:#fff;cursor:pointer;min-height:48px}
+button.secondary{background:transparent;color:var(--fg)}
+button:disabled{opacity:.5;cursor:not-allowed}
+button:focus-visible,a:focus-visible{outline:3px solid #007a63;outline-offset:2px}
+.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+footer{width:min(720px,94vw);padding:20px 0 32px;color:var(--muted);font-size:.85rem;text-align:center}
+.ad{border:1px dashed rgba(0,0,0,.25);border-radius:10px;padding:10px;margin-top:18px;font-size:.8rem}
+.back{display:inline-block;margin-bottom:14px;font-size:.9rem;color:var(--muted)}
+@media(prefers-color-scheme:dark){:focus-visible{outline-color:#00cec9}.card,button,.ad{border-color:rgba(255,255,255,.24)}}
+@media(prefers-reduced-motion:no-preference){.card{animation:lmao-pop .35s ease-out}button:active{transform:scale(.95)}}
+@keyframes lmao-pop{from{transform:translateY(8px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+@media(prefers-reduced-motion:reduce){.card{animation:none!important}button:active{transform:none!important}*{transition:none!important;animation-duration:.01ms!important}}
+/* LMAO v3 toy layer */
+:root{--ink:#23212b;--paper:#f6f1e7;--card:#fffdf7}
+body{background:var(--paper);background-image:radial-gradient(rgba(35,33,43,.08) 1px,transparent 1px);background-size:22px 22px}
+.card{background:var(--card);border:2px solid var(--ink);border-radius:20px;box-shadow:5px 5px 0 var(--ink)}
+h1{font-weight:800;letter-spacing:-.02em;font-size:1.75rem}
+p.sub{line-height:1.7}
+button{border:2px solid var(--ink);border-radius:14px;box-shadow:3px 3px 0 var(--ink);transition:transform .08s,box-shadow .08s}
+button:active{transform:translate(2px,2px) scale(.98);box-shadow:1px 1px 0 var(--ink)}
+@media(prefers-color-scheme:dark){:root{--ink:#f0eadd;--paper:#17151d;--card:#232029}body{background-image:radial-gradient(rgba(240,234,221,.07) 1px,transparent 1px)}}
+.skip{position:absolute;left:-9999px;top:0;background:var(--fg);color:var(--bg);padding:10px 16px;z-index:99;border-radius:0 0 8px 0}.skip:focus{left:0;outline:3px solid #007a63}button:focus,a:focus,[tabindex]:focus,input:focus,label.drop:focus-within{outline:3px solid #007a63;outline-offset:2px}@media(prefers-color-scheme:dark){button:focus,a:focus,[tabindex]:focus,input:focus,label.drop:focus-within{outline-color:#00cec9}}
+/* app */
+.drop{display:block;border:2px dashed var(--ink);border-radius:16px;padding:26px 16px;cursor:pointer;background:rgba(108,92,231,.06)}
+.drop.over{background:rgba(108,92,231,.18)}
+.drop strong{display:block;font-size:1.1rem}
+.drop span{color:var(--muted);font-size:.9rem}
+.drop input{position:absolute;opacity:0;width:1px;height:1px}
+details{text-align:left;margin-top:16px;border:2px solid var(--ink);border-radius:14px;padding:10px 14px}
+summary{cursor:pointer;font-weight:700}
+.opt{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center;margin-top:10px;font-size:.92rem}
+.opt input[type=number]{width:6.5em;font:inherit;font-size:16px;padding:6px 8px;border-radius:8px;border:2px solid var(--ink);background:var(--card);color:var(--fg)}
+.opt input[type=range]{width:12em}
+.opt small{grid-column:1/-1;color:var(--muted);margin-top:-4px}
+#status{min-height:1.6em;margin:16px 0 6px;font-weight:600}
+progress{width:100%;height:14px;accent-color:var(--accent)}
+#result{margin-top:18px}
+#result[hidden],progress[hidden]{display:none}
+.brag{background:rgba(108,92,231,.1);border-radius:12px;padding:10px 12px;margin:0 0 12px}
+canvas{display:block;width:100%;height:90px;border:2px solid var(--ink);border-radius:12px;cursor:crosshair;background:var(--card)}
+.legend{display:flex;justify-content:space-between;color:var(--muted);font-size:.8rem;margin-top:4px}
+ol.segs{list-style:none;padding:0;margin:14px 0 0;text-align:left}
+ol.segs li{border:2px solid var(--ink);border-radius:14px;padding:10px 12px;margin-top:10px;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+ol.segs li.off{opacity:.55}
+ol.segs li.playing{box-shadow:3px 3px 0 var(--accent)}
+.segs .n{font-weight:800;min-width:2.4em}
+.segs label.t{display:flex;align-items:center;gap:4px;font-size:.88rem;color:var(--muted)}
+.segs input[type=text]{width:6.2em;font:inherit;font-size:16px;font-variant-numeric:tabular-nums;padding:4px 6px;border-radius:8px;border:2px solid var(--ink);background:var(--card);color:var(--fg)}
+.segs input[type=checkbox]{width:22px;height:22px;accent-color:var(--accent)}
+.segs .len{font-variant-numeric:tabular-nums;font-size:.88rem}
+.segs .acts{margin-left:auto;display:flex;flex-wrap:wrap;gap:6px}
+.segs button{font-size:.9rem;padding:6px 10px;min-height:44px;min-width:44px;box-shadow:2px 2px 0 var(--ink)}
+.note{color:var(--muted);font-size:.85rem;margin-top:12px}
+a.btn{display:inline-flex;align-items:center;justify-content:center;font-size:1.05rem;padding:12px 20px;border-radius:14px;border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);background:var(--accent);color:#fff;text-decoration:none;min-height:48px}
+a.btn[hidden]{display:none}
+</style>
+</head>
+<body><a class="skip" href="#maincontent">본문 바로가기</a>
+<main id="maincontent"><div class="card">
+<h1>노래만 잘라주는 가위</h1>
+<p class="sub">대사 나왔다가 노래 나왔다가 하는 긴 녹음(드라마·라디오·뮤지컬 등)을 올리면 노래 구간만 찾아서 곡별로 잘라 드려요.<br>대사는 가차 없이 버립니다. 파일은 이 기기 밖으로 한 발짝도 안 나가요.</p>
+
+<label class="drop" id="drop">
+<input type="file" id="file" accept="audio/*,video/mp4,.m4a,.mp3,.aac,.wav,.flac,.ogg,.opus,.webm,.mp4">
+<strong>여기를 눌러 파일 고르기</strong>
+<span>또는 파일을 끌어다 놓기 · m4a, mp3, wav, aac, flac, ogg 등</span>
+</label>
+
+<details>
+<summary>세부 설정</summary>
+<div class="opt">
+<label for="minSong">최소 곡 길이 (초)</label><input type="number" id="minSong" min="10" max="900" step="5" value="60">
+<small>이보다 짧은 음악(징글·효과음)은 버려요.</small>
+<label for="gap">곡 사이 무음 (초)</label><input type="number" id="gap" min="0.5" max="10" step="0.1" value="2">
+<small>대사 없이 노래끼리 붙어 있을 때, 사이 무음이 이만큼 길면 다른 곡으로 나눠요.</small>
+<label for="sens">감도: 엄격 ↔ 너그럽게</label><input type="range" id="sens" min="-3" max="3" step="1" value="0">
+<small>노래를 놓치면 너그럽게, 말소리까지 잡히면 엄격하게.</small>
+</div>
+</details>
+
+<p id="status" role="status" aria-live="polite"></p>
+<progress id="prog" max="1" value="0" hidden></progress>
+
+<section id="result" hidden aria-label="찾은 노래">
+<p class="brag" id="brag"></p>
+<canvas id="tl" aria-label="전체 타임라인. 누르면 그 지점부터 재생" role="img"></canvas>
+<div class="legend"><span>0:00</span><span>보라색 = 노래 · 누르면 거기부터 재생</span><span id="tlEnd"></span></div>
+<div class="row">
+<button id="zipBtn" type="button">선택한 곡 전부 저장 (ZIP)</button>
+<a id="zipLink" class="btn" hidden></a>
+<button id="stopBtn" type="button" class="secondary">■ 정지</button>
+<button id="addBtn" type="button" class="secondary">+ 구간 직접 추가</button>
+</div>
+<ol class="segs" id="segs"></ol>
+<p class="note"><span id="fmtNote"></span> 시작·끝 시간은 직접 고칠 수 있어요 (예: 3:21.5). 설정을 바꾸면 다시 찾으면서 수정한 구간은 초기화돼요.</p>
+</section>
+</div></main>
+<footer>무료 · 로그인 없음 · 파일은 기기 밖으로 안 나가요</footer>
+
+<script id="a2m-core">
+"use strict";
+// Music-segment detector. Pure functions; no DOM. Works on mono audio at ~11 kHz.
+const A2M = (() => {
+  const N = 1024, HOP = 512;
+
+  function analysisFactor(rate) { return Math.max(1, Math.round(rate / 11025)); }
+
+  // Downmix channels[start, start + n*d) to mono and decimate by d with a box filter.
+  function decimateMono(chs, start, end, d) {
+    const n = Math.floor((end - start) / d), out = new Float32Array(n), c = chs.length, k = 1 / (d * c);
+    for (let i = 0; i < n; i++) {
+      const b = start + i * d;
+      let s = 0;
+      for (let ch = 0; ch < c; ch++) { const a = chs[ch]; for (let j = 0; j < d; j++) s += a[b + j]; }
+      out[i] = s * k;
+    }
+    return out;
+  }
+
+  function makeFFT(n) {
+    const bits = Math.log2(n) | 0, rev = new Uint32Array(n), cos = new Float64Array(n / 2), sin = new Float64Array(n / 2);
+    for (let i = 0; i < n; i++) { let r = 0; for (let b = 0, x = i; b < bits; b++, x >>= 1) r = (r << 1) | (x & 1); rev[i] = r; }
+    for (let i = 0; i < n / 2; i++) { cos[i] = Math.cos(2 * Math.PI * i / n); sin[i] = Math.sin(2 * Math.PI * i / n); }
+    return (re, im) => {
+      for (let i = 0; i < n; i++) {
+        const j = rev[i];
+        if (j > i) { let t = re[i]; re[i] = re[j]; re[j] = t; t = im[i]; im[i] = im[j]; im[j] = t; }
+      }
+      for (let size = 2; size <= n; size <<= 1) {
+        const half = size >> 1, step = n / size;
+        for (let i = 0; i < n; i += size) {
+          for (let j = i, k = 0; j < i + half; j++, k += step) {
+            const l = j + half, tr = re[l] * cos[k] + im[l] * sin[k], ti = im[l] * cos[k] - re[l] * sin[k];
+            re[l] = re[j] - tr; im[l] = im[j] - ti; re[j] += tr; im[j] += ti;
+          }
+        }
+      }
+    };
+  }
+
+  // Streaming per-frame features: rms, zero-crossing rate, spectral flatness, tonal-peak persistence, spectral flux.
+  class FrameAnalyzer {
+    constructor(ar) {
+      this.fps = ar / HOP;
+      this.tail = new Float32Array(0);
+      this.fft = makeFFT(N);
+      this.re = new Float64Array(N); this.im = new Float64Array(N);
+      this.win = Float64Array.from({ length: N }, (_, i) => 0.5 - 0.5 * Math.cos(2 * Math.PI * i / N));
+      const bin = ar / N;
+      this.kLo = Math.max(4, Math.ceil(100 / bin));
+      this.kHi = Math.min(N / 2 - 4, Math.floor(4000 / bin));
+      this.L = new Float64Array(N / 2 + 1); this.prevL = new Float64Array(N / 2 + 1);
+      this.kB0 = Math.max(1, Math.ceil(40 / bin)); this.kB1 = Math.max(this.kB0, Math.floor(150 / bin));
+      this.pk = new Uint8Array(N / 2 + 1); this.prevPk = new Uint8Array(N / 2 + 1);
+      this.e = []; this.zcr = []; this.flat = []; this.pers = []; this.flux = []; this.bflux = [];
+    }
+    push(x) {
+      let buf = x;
+      if (this.tail.length) { buf = new Float32Array(this.tail.length + x.length); buf.set(this.tail); buf.set(x, this.tail.length); }
+      let p = 0;
+      for (; p + N <= buf.length; p += HOP) this.frame(buf, p);
+      this.tail = buf.slice(p);
+    }
+    frame(b, o) {
+      const { re, im, win, L, kLo, kHi, kB0, kB1 } = this;
+      let s = 0, z = 0, prev = b[o];
+      for (let i = 0; i < N; i++) {
+        const v = b[o + i];
+        s += v * v;
+        if ((v >= 0) !== (prev >= 0)) z++;
+        prev = v; re[i] = v * win[i]; im[i] = 0;
+      }
+      this.fft(re, im);
+      let lsum = 0, psum = 0, mx = -Infinity;
+      for (let k = Math.min(kB0, kLo - 3); k <= kHi + 3; k++) {
+        const p = re[k] * re[k] + im[k] * im[k] + 1e-12, l = Math.log(p);
+        L[k] = l;
+        if (k >= kLo && k <= kHi) { lsum += l; psum += p; if (l > mx) mx = l; }
+      }
+      const nb = kHi - kLo + 1;
+      // Peaks within 50 dB of the frame max that stand 8 dB above their ±3-bin surroundings (ln units).
+      const pk = this.pk, pp = this.prevPk;
+      pk.fill(0);
+      let cnt = 0, hit = 0;
+      for (let k = kLo; k <= kHi; k++) {
+        const l = L[k];
+        if (l > L[k - 1] && l >= L[k + 1] && l > mx - 11.5 && l - Math.min(L[k - 3], L[k + 3]) > 1.84) {
+          pk[k] = 1; cnt++;
+          if (pp[k] || pp[k - 1] || pp[k + 1]) hit++;
+        }
+      }
+      this.pk = pp; this.prevPk = pk;
+      // Positive log-spectral flux (onset strength) for beat periodicity: full band and bass band
+      // (40-150 Hz, where kick drums carry the beat and speech has little energy).
+      const pl = this.prevL;
+      let fx = 0, bfx = 0;
+      for (let k = kLo; k <= kHi; k++) { const d = L[k] - pl[k]; if (d > 0) fx += d; }
+      for (let k = kB0; k <= kB1; k++) { const d = L[k] - pl[k]; if (d > 0) bfx += d; }
+      for (let k = Math.min(kB0, kLo); k <= kHi; k++) pl[k] = L[k];
+      this.e.push(Math.sqrt(s / N));
+      this.zcr.push(z / N);
+      this.flat.push(Math.exp(lsum / nb) / (psum / nb));
+      this.pers.push(cnt ? hit / cnt : 0);
+      this.flux.push(fx / nb);
+      this.bflux.push(bfx / (kB1 - kB0 + 1));
+    }
+    result() {
+      const f32 = (a) => Float32Array.from(a);
+      return { fps: this.fps, e: f32(this.e), zcr: f32(this.zcr), flat: f32(this.flat), pers: f32(this.pers), flux: f32(this.flux), bflux: f32(this.bflux) };
+    }
+  }
+
+  const DEFAULTS = { minSong: 60, gap: 2, join: 5, sens: 0, silenceDb: 30, smooth: 9, switchCost: 5 };
+  const clamp = (x) => x < -1 ? -1 : x > 1 ? 1 : x;
+
+  function percentile(arr, q) {
+    const stride = Math.max(1, Math.floor(arr.length / 20000)), s = [];
+    for (let i = 0; i < arr.length; i += stride) s.push(arr[i]);
+    s.sort((a, b) => a - b);
+    return s.length ? s[Math.min(s.length - 1, Math.floor(q * s.length))] : 0;
+  }
+
+  // Peak normalised autocorrelation of x[a, b) over lags [lo, hi] frames.
+  function periodicity(x, a, b, lo, hi) {
+    let mean = 0;
+    for (let i = a; i < b; i++) mean += x[i];
+    mean /= Math.max(1, b - a);
+    let r0 = 0;
+    for (let i = a; i < b; i++) r0 += (x[i] - mean) ** 2;
+    let best = 0;
+    for (let l = lo; l <= hi && r0 > 0; l++) {
+      let r = 0;
+      for (let i = a; i + l < b; i++) r += (x[i] - mean) * (x[i + l] - mean);
+      if (r / r0 > best) best = r / r0;
+    }
+    return best;
+  }
+
+  // Per-second stats: 2 s window for level/ZCR/spectral stats, 6 s window for beat periodicity.
+  function secondStats(f, quiet) {
+    const { fps, e, zcr, flat, pers, flux, bflux } = f, n = e.length, nSec = Math.ceil(n / fps);
+    const mk = () => new Float32Array(nSec);
+    const st = { ler: mk(), hz: mk(), flat: mk(), pers: mk(), dip: mk(), rhy: mk(), brhy: mk(), silent: new Uint8Array(nSec) };
+    const lagLo = Math.round(0.3 * fps), lagHi = Math.round(1.0 * fps), db = [];
+    for (let s = 0; s < nSec; s++) {
+      const a = Math.max(0, Math.round((s - 0.5) * fps)), b = Math.min(n, Math.round((s + 1.5) * fps));
+      let me = 0, mz = 0, q = 0, cnt = b - a;
+      for (let i = a; i < b; i++) { me += e[i]; mz += zcr[i]; q += quiet[i]; }
+      if (!cnt || q > 0.6 * cnt) { st.silent[s] = 1; continue; }
+      me /= cnt; mz /= cnt;
+      let lo = 0, hi = 0, fl = 0, pr = 0, w = 0;
+      db.length = 0;
+      for (let i = a; i < b; i++) {
+        if (e[i] < 0.5 * me) lo++;
+        if (zcr[i] > 1.5 * mz) hi++;
+        if (!quiet[i]) { fl += flat[i]; pr += pers[i]; w++; }
+        db.push(20 * Math.log10(e[i] + 1e-9));
+      }
+      db.sort((x, y) => x - y);
+      st.ler[s] = lo / cnt; st.hz[s] = hi / cnt;
+      st.flat[s] = w ? fl / w : 1; st.pers[s] = w ? pr / w : 0;
+      st.dip[s] = db[db.length >> 1] - db[Math.floor(db.length * 0.1)];
+      // Beat periodicity over 60-200 BPM lags, full band and bass band.
+      const ra = Math.max(0, Math.round((s - 2.5) * fps)), rb = Math.min(n, Math.round((s + 3.5) * fps));
+      st.rhy[s] = periodicity(flux, ra, rb, lagLo, lagHi);
+      st.brhy[s] = periodicity(bflux, ra, rb, lagLo, lagHi);
+    }
+    return st;
+  }
+
+  // Positive = music-like. Centres sit between measured dialogue (TTS + a real reverberant meeting
+  // recording) and song distributions, medians unless noted:
+  //   beat periodicity max(full, bass)  dialogue .14-.17 (p90 .22-.27)  songs .37, sparse verse .42
+  //   LER                               dialogue .19-.26                  songs .00 (p90 .14)
+  //   dip (median−p10 dB)               dialogue 7-21                     songs 3 (p90 6.5)
+  //   HZCRR, tonal persistence: half weight — room noise lowers dialogue ZCR (.09) and reverb
+  //   sustains dialogue peaks (.42 vs songs .47).
+  // Flatness only penalises broadband noise (applause/crowd ≈ .5); it never rewards.
+  function secondScore(st, s) {
+    if (st.silent[s]) return -0.5;
+    const rhy = clamp((Math.max(st.rhy[s], st.brhy[s]) - 0.23) / 0.06);
+    const ler = clamp((0.14 - st.ler[s]) / 0.08);
+    const dip = clamp((8 - st.dip[s]) / 3);
+    const hz = clamp((0.2 - st.hz[s]) / 0.05);
+    const pr = clamp((st.pers[s] - 0.43) / 0.04);
+    const fl = Math.min(0, (0.3 - st.flat[s]) / 0.1);
+    return clamp((1.5 * rhy + ler + dip + 0.5 * hz + 0.5 * pr + 1.5 * fl) / 4.5);
+  }
+
+  function detect(f, opts) {
+    const o = Object.assign({}, DEFAULTS, opts);
+    const { fps, e } = f, n = e.length;
+    const db = new Float32Array(n);
+    for (let i = 0; i < n; i++) db[i] = 20 * Math.log10(e[i] + 1e-9);
+    // "Quiet" = 30 dB under loud parts, raised only when the recording's hiss floor sits higher.
+    // p1 (not p5): mostly dialogue/music files have little true silence.
+    const ref = percentile(db, 0.95), floor = percentile(db, 0.01);
+    const qThr = Math.min(ref - 12, Math.max(ref - o.silenceDb, floor + 6));
+    const quiet = new Uint8Array(n);
+    for (let i = 0; i < n; i++) quiet[i] = db[i] < qThr ? 1 : 0;
+
+    const st = secondStats(f, quiet), nSec = st.silent.length;
+    const raw = new Float32Array(nSec), score = new Float32Array(nSec);
+    for (let s = 0; s < nSec; s++) raw[s] = secondScore(st, s);
+    const h = Math.floor(o.smooth / 2); // display-only smoothing
+    for (let s = 0; s < nSec; s++) {
+      let sum = 0, c = 0;
+      for (let t = Math.max(0, s - h); t <= Math.min(nSec - 1, s + h); t++) { sum += raw[t]; c++; }
+      score[s] = sum / c;
+    }
+
+    // Two-state Viterbi (0 = dialogue/other, 1 = music): music earns +m per second, dialogue −m,
+    // each switch costs `switchCost`. Sparse song verses stay inside the song; real dialogue breaks it.
+    const bias = 0.07 * o.sens, P = o.switchCost, back = new Uint8Array(nSec * 2);
+    let v0 = 0, v1 = 0;
+    for (let s = 0; s < nSec; s++) {
+      const m = (st.silent[s] ? -0.2 : raw[s]) + bias;
+      const s0 = v1 - P > v0, s1 = v0 - P > v1;
+      const n0 = (s0 ? v1 - P : v0) - m, n1 = (s1 ? v0 - P : v1) + m;
+      back[2 * s] = s0 ? 1 : 0; back[2 * s + 1] = s1 ? 0 : 1;
+      v0 = n0; v1 = n1;
+    }
+    const music = new Uint8Array(nSec);
+    for (let s = nSec - 1, k = v1 > v0 ? 1 : 0; s >= 0; s--) { music[s] = k; k = back[2 * s + k]; }
+    // Analysis windows straddle boundaries, so song edges score weakly: extend each edge outward
+    // (≤ 6 s) through seconds that are not clearly dialogue. Quiet frames are trimmed later.
+    const runs = [], soft = (s) => !st.silent[s] && raw[s] + bias > -0.2;
+    for (let s = 0; s < nSec;) {
+      if (!music[s]) { s++; continue; }
+      let a = s;
+      while (s < nSec && music[s]) s++;
+      let b = s;
+      const lo = runs.length ? runs[runs.length - 1][1] : 0;
+      for (let k = 0; k < 6 && a > lo && soft(a - 1); k++) a--;
+      for (let k = 0; k < 6 && b < nSec && !music[b] && soft(b); k++) b++;
+      runs.push([a, b]);
+    }
+
+    // Frame level: split runs at quiet gaps and trim quiet edges. Fragments (< 30 s, or minSong if
+    // smaller) are glued to the nearest neighbour across a short pause (songs have breaks), so a
+    // song with an internal pause stays whole while two full songs never merge.
+    const gapF = Math.max(1, Math.round(o.gap * fps)), joinF = o.join * fps, minF = o.minSong * fps, pieces = [];
+    const fragF = Math.min(o.minSong, 30) * fps;
+    const piece = (a, b) => {
+      while (a < b && quiet[a]) a++;
+      while (b > a && quiet[b - 1]) b--;
+      if (b > a) pieces.push([a, b]);
+    };
+    for (const [sa, sb] of runs) {
+      const a = Math.round(sa * fps), b = Math.min(n, Math.round(sb * fps));
+      let segA = a;
+      for (let i = a; i < b;) {
+        if (!quiet[i]) { i++; continue; }
+        let j = i;
+        while (j < b && quiet[j]) j++;
+        if (j - i >= gapF) { piece(segA, i); segA = j; }
+        i = j;
+      }
+      piece(segA, b);
+    }
+    for (let i = 0; i < pieces.length;) {
+      const p = pieces[i];
+      if (p[1] - p[0] >= fragF) { i++; continue; }
+      const gl = i > 0 ? p[0] - pieces[i - 1][1] : Infinity, gr = i < pieces.length - 1 ? pieces[i + 1][0] - p[1] : Infinity;
+      if (Math.min(gl, gr) > joinF) { i++; continue; }
+      if (gl <= gr) { pieces[i - 1][1] = p[1]; pieces.splice(i, 1); i--; }
+      else { pieces[i + 1][0] = p[0]; pieces.splice(i, 1); }
+    }
+    // Keep fade-ins/outs: grow each song through adjacent quiet frames that are still above the
+    // recording's noise floor (≤ 12 s), never into a neighbouring song.
+    const kept = pieces.filter(([a, b]) => b - a >= minF), deep = floor + 6, fadeF = 12 * fps, segments = [];
+    kept.forEach((p, i) => {
+      const lo = i ? kept[i - 1][1] : 0, hi = i < kept.length - 1 ? kept[i + 1][0] : n;
+      let [a, b] = p;
+      while (a > lo && p[0] - a < fadeF && quiet[a - 1] && db[a - 1] > deep) a--;
+      while (b < hi && b - p[1] < fadeF && quiet[b] && db[b] > deep) b++;
+      p[0] = a; p[1] = b;
+      segments.push({ start: a / fps, end: Math.min(n, b + 1) / fps });
+    });
+    return { segments, score };
+  }
+
+  return { analysisFactor, decimateMono, FrameAnalyzer, detect, DEFAULTS };
+})();
+</script>
+
+<script id="a2m-media">
+"use strict";
+// Container-level cutting. m4a/mp4 (one audio track), mp3 and wav are indexed frame by frame and
+// cut straight out of the File: no full decode (phones can't hold an hour of float PCM) and no
+// re-encode (songs keep the original format and quality). Anything else falls back to a decoded
+// AudioBuffer exported as WAV. Every cut() is synchronous so play()/download/share stay inside
+// the tap gesture that iOS requires.
+const Media = (() => {
+  const enc = new TextEncoder();
+  const ascii = (u8, o) => String.fromCharCode(u8[o], u8[o + 1], u8[o + 2], u8[o + 3]);
+  const read = async (file, a, b) => new Uint8Array(await file.slice(a, b).arrayBuffer());
+
+  // Frames [i0, i1) covering [t0, t1); t holds n+1 ascending frame start times.
+  function frameRange(t, t0, t1) {
+    const n = t.length - 1;
+    const at = (x) => { let lo = 0, hi = n; while (lo < hi) { const m = (lo + hi + 1) >> 1; if (t[m] <= x) lo = m; else hi = m - 1; } return lo; };
+    const i0 = Math.min(n - 1, at(t0));
+    let i1 = at(t1);
+    if (t[i1] < t1) i1++;
+    return [i0, Math.max(i0 + 1, Math.min(n, i1))];
+  }
+  // File slices for frames [i0, i1), merging byte-contiguous frames.
+  function frameBytes(file, off, size, i0, i1) {
+    const parts = [];
+    let a = off[i0], b = a + size[i0];
+    for (let i = i0 + 1; i < i1; i++) {
+      if (off[i] === b) b += size[i];
+      else { parts.push(file.slice(a, b)); a = off[i]; b = a + size[i]; }
+    }
+    parts.push(file.slice(a, b));
+    return parts;
+  }
+  function frameSource(kind, ext, mime, file, off, size, t, head) {
+    return {
+      kind, ext, mime, duration: t[t.length - 1], preroll: 0.1,
+      cut(t0, t1) {
+        const [i0, i1] = frameRange(t, t0, t1);
+        return { blob: new Blob([...head(i0, i1), ...frameBytes(file, off, size, i0, i1)], { type: mime }), t0: t[i0], t1: t[i1] };
+      },
+    };
+  }
+
+  // ---- MP4 / M4A ----
+  function* kids(u8, dv, a, b) {
+    while (a + 8 <= b) {
+      let size = dv.getUint32(a), hdr = 8;
+      const type = ascii(u8, a + 4);
+      if (size === 1) { size = Number(dv.getBigUint64(a + 8)); hdr = 16; } else if (size === 0) size = b - a;
+      if (size < hdr || a + size > b) return;
+      yield { type, a, p: a + hdr, b: a + size };
+      a += size;
+    }
+  }
+  const kid = (u8, dv, box, type) => { if (box) for (const k of kids(u8, dv, box.p, box.b)) if (k.type === type) return k; return null; };
+  const be = (...v) => { const o = new Uint8Array(v.length * 4), d = new DataView(o.buffer); v.forEach((x, i) => d.setUint32(i * 4, x)); return o; };
+  const be16 = (...v) => { const o = new Uint8Array(v.length * 2), d = new DataView(o.buffer); v.forEach((x, i) => d.setUint16(i * 2, x)); return o; };
+  function box(type, ...parts) {
+    const len = parts.reduce((s, p) => s + p.length, 8), o = new Uint8Array(len);
+    new DataView(o.buffer).setUint32(0, len); o.set(enc.encode(type), 4);
+    let p = 8;
+    for (const x of parts) { o.set(x, p); p += x.length; }
+    return o;
+  }
+  const MATRIX = be(0x10000, 0, 0, 0, 0x10000, 0, 0, 0, 0x40000000);
+
+  async function openMp4(file) {
+    let pos = 0, moov = null;
+    while (pos + 8 <= file.size) {
+      const h = await read(file, pos, Math.min(file.size, pos + 16)), dv = new DataView(h.buffer);
+      let size = dv.getUint32(0), hdr = 8;
+      if (size === 1 && h.length >= 16) { size = Number(dv.getBigUint64(8)); hdr = 16; } else if (size === 0) size = file.size - pos;
+      if (size < hdr) return null;
+      if (ascii(h, 4) === "moov") { moov = await read(file, pos, pos + size); break; }
+      pos += size;
+    }
+    if (!moov) return null;
+    const dv = new DataView(moov.buffer), root = [...kids(moov, dv, 0, moov.length)][0];
+    if (kid(moov, dv, root, "mvex")) return null; // fragmented MP4: not indexed here
+    let stbl = null, ts = 0;
+    for (const trak of kids(moov, dv, root.p, root.b)) {
+      if (trak.type !== "trak") continue;
+      const mdia = kid(moov, dv, trak, "mdia"), hdlr = kid(moov, dv, mdia, "hdlr"), mdhd = kid(moov, dv, mdia, "mdhd");
+      if (!hdlr || !mdhd || ascii(moov, hdlr.p + 8) !== "soun") continue;
+      ts = dv.getUint32(mdhd.p + (moov[mdhd.p] === 1 ? 20 : 12));
+      stbl = kid(moov, dv, kid(moov, dv, mdia, "minf"), "stbl");
+      break;
+    }
+    const stsd = kid(moov, dv, stbl, "stsd"), stsz = kid(moov, dv, stbl, "stsz"), stsc = kid(moov, dv, stbl, "stsc"), stts = kid(moov, dv, stbl, "stts");
+    const stco = kid(moov, dv, stbl, "stco"), co64 = kid(moov, dv, stbl, "co64");
+    if (!ts || !stsd || !stsz || !stsc || !stts || !(stco || co64)) return null;
+    const n = dv.getUint32(stsz.p + 8), fixed = dv.getUint32(stsz.p + 4);
+    if (!n) return null;
+    const size = new Uint32Array(n);
+    for (let i = 0; i < n; i++) size[i] = fixed || dv.getUint32(stsz.p + 12 + 4 * i);
+    const cb = stco || co64, nChunks = dv.getUint32(cb.p + 4);
+    const chunkOff = (c) => co64 ? Number(dv.getBigUint64(cb.p + 8 + 8 * c)) : dv.getUint32(cb.p + 8 + 4 * c);
+    const nsc = dv.getUint32(stsc.p + 4), scFirst = (j) => dv.getUint32(stsc.p + 8 + 12 * j), scCount = (j) => dv.getUint32(stsc.p + 12 + 12 * j);
+    const off = new Float64Array(n);
+    for (let c = 0, j = 0, s = 0; c < nChunks && s < n; c++) {
+      while (j + 1 < nsc && scFirst(j + 1) <= c + 1) j++;
+      let o = chunkOff(c);
+      for (let k = scCount(j); k > 0 && s < n; k--, s++) { off[s] = o; o += size[s]; }
+    }
+    const ticks = new Float64Array(n + 1), nts = dv.getUint32(stts.p + 4);
+    let s = 0, delta = 1024;
+    for (let j = 0; j < nts && s < n; j++) {
+      const cnt = dv.getUint32(stts.p + 8 + 8 * j);
+      delta = dv.getUint32(stts.p + 12 + 8 * j);
+      for (let k = 0; k < cnt && s < n; k++, s++) ticks[s + 1] = ticks[s] + delta;
+    }
+    for (; s < n; s++) ticks[s + 1] = ticks[s] + delta;
+    const t = ticks.map((x) => x / ts), stsdBytes = moov.slice(stsd.a, stsd.b);
+
+    // Minimal single-track M4A: ftyp + moov (all samples in one chunk) + mdat.
+    const head = (i0, i1) => {
+      const cnt = i1 - i0, dur = ticks[i1] - ticks[i0], runs = [];
+      for (let i = i0; i < i1; i++) {
+        const d = ticks[i + 1] - ticks[i], r = runs[runs.length - 1];
+        if (r && r[1] === d) r[0]++; else runs.push([1, d]);
+      }
+      const sizes = new Uint8Array(cnt * 4), sd = new DataView(sizes.buffer);
+      let bytes = 0;
+      for (let i = 0; i < cnt; i++) { sd.setUint32(i * 4, size[i0 + i]); bytes += size[i0 + i]; }
+      const ftyp = box("ftyp", enc.encode("M4A "), be(0x200), enc.encode("M4A isomiso2"));
+      const stblOut = box("stbl", stsdBytes,
+        box("stts", be(0, runs.length, ...runs.flat())),
+        box("stsc", be(0, 1, 1, cnt, 1)),
+        box("stsz", be(0, 0, cnt), sizes),
+        box("stco", be(0, 1, 0)));
+      const moovOut = box("moov",
+        box("mvhd", be(0, 0, 0, ts, dur, 0x10000), be16(0x100), new Uint8Array(10), MATRIX, new Uint8Array(24), be(2)),
+        box("trak",
+          box("tkhd", be(3, 0, 0, 1, 0, dur), new Uint8Array(8), be16(0, 0, 0x100, 0), MATRIX, be(0, 0)),
+          box("mdia",
+            box("mdhd", be(0, 0, 0, ts, dur), be16(0x55c4, 0)),
+            box("hdlr", be(0, 0), enc.encode("soun"), new Uint8Array(12), enc.encode("SoundHandler\0")),
+            box("minf", box("smhd", new Uint8Array(8)), box("dinf", box("dref", be(0, 1), box("url ", be(1)))), stblOut))));
+      // stco is the very last field of moov: patch in where mdat's payload starts.
+      new DataView(moovOut.buffer).setUint32(moovOut.length - 4, ftyp.length + moovOut.length + 8);
+      return [ftyp, moovOut, be(bytes + 8), enc.encode("mdat")];
+    };
+    return frameSource("m4a", "m4a", "audio/mp4", file, off, size, t, head);
+  }
+
+  // ---- MP3 ----
+  const BR = [
+    [0, 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448], // MPEG1 L1
+    [0, 32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384], // MPEG1 L2
+    [0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320], // MPEG1 L3
+    [0, 32, 48, 56, 64, 80, 96, 112, 128, 144, 160, 176, 192, 224, 256], // MPEG2/2.5 L1
+    [0, 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160], // MPEG2/2.5 L2, L3
+  ];
+  const SR = { 3: [44100, 48000, 32000], 2: [22050, 24000, 16000], 0: [11025, 12000, 8000] };
+  function mp3Head(b, o) {
+    if (b[o] !== 0xff || (b[o + 1] & 0xe0) !== 0xe0) return null;
+    const ver = (b[o + 1] >> 3) & 3, layer = 4 - ((b[o + 1] >> 1) & 3), bri = b[o + 2] >> 4, sri = (b[o + 2] >> 2) & 3;
+    if (ver === 1 || layer === 4 || bri === 0 || bri === 15 || sri === 3) return null;
+    const v1 = ver === 3, br = BR[v1 ? layer - 1 : layer === 1 ? 3 : 4][bri] * 1000, sr = SR[ver][sri], padb = (b[o + 2] >> 1) & 1;
+    const spf = layer === 1 ? 384 : layer === 3 && !v1 ? 576 : 1152;
+    const len = layer === 1 ? (Math.floor(12 * br / sr) + padb) * 4 : Math.floor(spf / 8 * br / sr) + padb;
+    return { len, spf, sr, key: ((b[o + 1] & 0xfe) << 8) | (b[o + 2] & 0x0c) };
+  }
+  async function openMp3(file) {
+    let win = new Uint8Array(0), base = 0;
+    const at = async (p) => {
+      if (p < base || p + 4 > base + win.length) { win = await read(file, p, Math.min(file.size, p + (1 << 22))); base = p; }
+      return p + 4 <= base + win.length ? mp3Head(win, p - base) : null;
+    };
+    const id3 = await read(file, 0, Math.min(file.size, 10));
+    let pos = 0;
+    if (id3.length === 10 && ascii(id3, 0).startsWith("ID3")) pos = 10 + ((id3[6] << 21) | (id3[7] << 14) | (id3[8] << 7) | id3[9]) + (id3[5] & 0x10 ? 10 : 0);
+    const off = [], size = [];
+    let key = -1, sr = 0, spf = 0;
+    const start = pos;
+    while (pos + 4 <= file.size) {
+      const h = await at(pos);
+      if (h && pos + h.len <= file.size && (key < 0 ? (await at(pos + h.len))?.key === h.key : h.key === key)) {
+        if (key < 0) { key = h.key; sr = h.sr; spf = h.spf; }
+        off.push(pos); size.push(h.len); pos += h.len;
+        continue;
+      }
+      if (key < 0 && pos - start > 65536) return null; // no MPEG audio near the start
+      pos++;
+    }
+    if (off.length < 10) return null;
+    // A leading Xing/Info/VBRI frame is silent metadata whose frame count would be wrong in a cut.
+    const f0 = await read(file, off[0], off[0] + Math.min(size[0], 64)), tag = new TextDecoder("latin1").decode(f0);
+    if (/Xing|Info|VBRI/.test(tag)) { off.shift(); size.shift(); }
+    const t = Float64Array.from({ length: off.length + 1 }, (_, i) => i * spf / sr);
+    return frameSource("mp3", "mp3", "audio/mpeg", file, off, size, t, () => []);
+  }
+
+  // ---- WAV ----
+  async function openWav(file) {
+    let p = 12, fmt = null, dataOff = 0, dataLen = 0;
+    while (p + 8 <= file.size) {
+      const c = await read(file, p, p + 8), len = new DataView(c.buffer).getUint32(4, true), id = ascii(c, 0);
+      if (id === "fmt ") fmt = await read(file, p, p + 8 + len + (len & 1));
+      else if (id === "data") { dataOff = p + 8; dataLen = Math.min(len || Infinity, file.size - dataOff); break; }
+      p += 8 + len + (len & 1);
+    }
+    if (!fmt || !dataOff) return null;
+    const fd = new DataView(fmt.buffer), sr = fd.getUint32(12, true), ba = fd.getUint16(20, true);
+    if (!sr || !ba) return null;
+    const frames = Math.floor(dataLen / ba), duration = frames / sr;
+    return {
+      kind: "wav", ext: "wav", mime: "audio/wav", duration, preroll: 0,
+      cut(t0, t1) {
+        const a = Math.max(0, Math.min(frames - 1, Math.floor(t0 * sr))), b = Math.max(a + 1, Math.min(frames, Math.ceil(t1 * sr)));
+        const hdr = new Uint8Array(12), hd = new DataView(hdr.buffer), dh = new Uint8Array(8), dd = new DataView(dh.buffer);
+        hdr.set(enc.encode("RIFF")); hd.setUint32(4, 4 + fmt.length + 8 + (b - a) * ba, true); hdr.set(enc.encode("WAVE"), 8);
+        dh.set(enc.encode("data")); dd.setUint32(4, (b - a) * ba, true);
+        return { blob: new Blob([hdr, fmt, dh, file.slice(dataOff + a * ba, dataOff + b * ba)], { type: "audio/wav" }), t0: a / sr, t1: b / sr };
+      },
+    };
+  }
+
+  // ---- Fallback: decoded AudioBuffer → 16-bit WAV with 20 ms fades so cuts don't click ----
+  function pcmSource(buf) {
+    return {
+      kind: "pcm", ext: "wav", mime: "audio/wav", duration: buf.duration, preroll: 0, buffer: buf,
+      cut(t0, t1) {
+        const sr = buf.sampleRate, ch = buf.numberOfChannels;
+        const a = Math.max(0, Math.floor(t0 * sr)), b = Math.min(buf.length, Math.ceil(t1 * sr)), n = Math.max(0, b - a);
+        const out = new ArrayBuffer(44 + n * ch * 2), v = new DataView(out);
+        const str = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+        str(0, "RIFF"); v.setUint32(4, 36 + n * ch * 2, true); str(8, "WAVE"); str(12, "fmt ");
+        v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, ch, true); v.setUint32(24, sr, true);
+        v.setUint32(28, sr * ch * 2, true); v.setUint16(32, ch * 2, true); v.setUint16(34, 16, true);
+        str(36, "data"); v.setUint32(40, n * ch * 2, true);
+        const pcm = new Int16Array(out, 44), fade = Math.min(Math.floor(sr * 0.02), n >> 1);
+        for (let c = 0; c < ch; c++) {
+          const data = buf.getChannelData(c);
+          for (let i = 0; i < n; i++) {
+            let x = data[a + i];
+            if (i < fade) x *= i / fade; else if (n - 1 - i < fade) x *= (n - 1 - i) / fade;
+            x = x < -1 ? -1 : x > 1 ? 1 : x;
+            pcm[i * ch + c] = x < 0 ? x * 32768 : x * 32767;
+          }
+        }
+        return { blob: new Blob([out], { type: "audio/wav" }), t0: a / sr, t1: b / sr };
+      },
+    };
+  }
+
+  async function open(file) {
+    const h = await read(file, 0, Math.min(file.size, 12));
+    if (h.length < 12) return null;
+    try {
+      if (ascii(h, 4) === "ftyp") return await openMp4(file);
+      if (ascii(h, 0) === "RIFF" && ascii(h, 8) === "WAVE") return await openWav(file);
+      if (ascii(h, 0).startsWith("ID3") || (h[0] === 0xff && (h[1] & 0xe0) === 0xe0)) return await openMp3(file);
+    } catch (_) { /* unparseable container: caller falls back to a full decode */ }
+    return null;
+  }
+
+  // Mono samples for exactly [t0, t1) at ctx.sampleRate. Each slice is decoded from a small cut
+  // that starts `preroll` early (codec warm-up); decoders may add or drop a few priming samples,
+  // so the result is aligned by length against the cut's known span (error ≤ a few ms).
+  async function decodeMono(src, t0, t1, ctx) {
+    const ar = ctx.sampleRate, c = src.cut(Math.max(0, t0 - src.preroll), t1);
+    const buf = await ctx.decodeAudioData(await c.blob.arrayBuffer());
+    const n = buf.length, ch = buf.numberOfChannels, x = new Float32Array(n);
+    for (let k = 0; k < ch; k++) { const d = buf.getChannelData(k); for (let i = 0; i < n; i++) x[i] += d[i] / ch; }
+    const want = Math.round((c.t1 - c.t0) * ar), len = Math.round((t1 - t0) * ar), out = new Float32Array(len);
+    const skip = Math.round((t0 - c.t0) * ar) + Math.max(0, n - want);
+    out.set(x.subarray(Math.min(n, skip), Math.min(n, skip + len)));
+    return out;
+  }
+
+  const CRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  function crc32(d) { let c = 0xffffffff; for (let i = 0; i < d.length; i++) c = CRC[(c ^ d[i]) & 255] ^ (c >>> 8); return (c ^ 0xffffffff) >>> 0; }
+  // Stored (uncompressed) ZIP of {name, blob}; audio barely compresses. Reads one file at a time
+  // for its CRC and keeps only the Blob, so memory stays at one song.
+  async function zip(files, onStep) {
+    const parts = [], central = [];
+    let off = 0, cdSize = 0;
+    for (const [k, f] of files.entries()) {
+      onStep(k);
+      const name = enc.encode(f.name), crc = crc32(new Uint8Array(await f.blob.arrayBuffer())), size = f.blob.size;
+      const lh = new DataView(new ArrayBuffer(30));
+      lh.setUint32(0, 0x04034b50, true); lh.setUint16(4, 20, true); lh.setUint16(6, 0x0800, true);
+      lh.setUint16(12, 33, true); lh.setUint32(14, crc, true); lh.setUint32(18, size, true); lh.setUint32(22, size, true);
+      lh.setUint16(26, name.length, true);
+      parts.push(lh.buffer, name, f.blob);
+      const cd = new DataView(new ArrayBuffer(46));
+      cd.setUint32(0, 0x02014b50, true); cd.setUint16(4, 20, true); cd.setUint16(6, 20, true); cd.setUint16(8, 0x0800, true);
+      cd.setUint16(14, 33, true); cd.setUint32(16, crc, true); cd.setUint32(20, size, true); cd.setUint32(24, size, true);
+      cd.setUint16(28, name.length, true); cd.setUint32(42, off, true);
+      central.push(cd.buffer, name);
+      cdSize += 46 + name.length; off += 30 + name.length + size;
+    }
+    const end = new DataView(new ArrayBuffer(22));
+    end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true);
+    end.setUint32(12, cdSize, true); end.setUint32(16, off, true);
+    return new Blob([...parts, ...central, end.buffer], { type: "application/zip" });
+  }
+
+  return { open, pcmSource, decodeMono, zip };
+})();
+</script>
+
+<script>
+"use strict";
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const ui = { file: $("file"), drop: $("drop"), status: $("status"), prog: $("prog"), result: $("result"), brag: $("brag"), tl: $("tl"), tlEnd: $("tlEnd"), segs: $("segs"), zip: $("zipBtn"), zipLink: $("zipLink"), stop: $("stopBtn"), add: $("addBtn"), minSong: $("minSong"), gap: $("gap"), sens: $("sens"), fmtNote: $("fmtNote") };
+  const st = { name: "", src: null, feat: null, det: null, segs: [], play: null, cursor: 0, busy: false, zipUrl: "" };
+  const player = new Audio();
+  const AR = 11025; // analysis sample rate
+  // Fallback full decode only: float PCM budget (assumes stereo). Phones get far less memory per tab.
+  const MOBILE = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
+  const MEM_BUDGET = MOBILE ? 400e6 : 1.6e9;
+  const RATES = [44100, 32000, 22050, 16000];
+
+  const pad = (x, w) => String(x).padStart(w, "0");
+  function fmt(t) {
+    t = Math.max(0, t);
+    const h = Math.floor(t / 3600), m = Math.floor(t / 60) % 60, s = t % 60;
+    const ss = s.toFixed(1).padStart(4, "0");
+    return h ? `${h}:${pad(m, 2)}:${ss}` : `${m}:${ss}`;
+  }
+  function fmtLong(t) {
+    t = Math.round(t);
+    const h = Math.floor(t / 3600), m = Math.floor(t / 60) % 60, s = t % 60;
+    return (h ? `${h}시간 ` : "") + (h || m ? `${m}분 ` : "") + `${s}초`;
+  }
+  function parseTime(str) {
+    const p = String(str).trim().split(":").map(Number);
+    if (!p.length || p.length > 3 || p.some((x) => !isFinite(x) || x < 0)) return NaN;
+    return p.reduce((acc, x) => acc * 60 + x, 0);
+  }
+  const say = (msg) => { ui.status.textContent = msg; };
+  const tick = () => new Promise((r) => setTimeout(r, 0));
+  function progress(v) {
+    ui.prog.hidden = v == null;
+    if (v === -1) ui.prog.removeAttribute("value"); else if (v != null) ui.prog.value = v;
+  }
+  const mb = (n) => `${(n / 1e6).toFixed(n < 1e7 ? 1 : 0)}MB`;
+
+  // Fast path: decode 30 s slices (3 in flight) straight into the analyser.
+  async function analyzeSlices(src) {
+    const ctx = new OfflineAudioContext(1, 1, AR), an = new A2M.FrameAnalyzer(AR), SL = 30, n = Math.ceil(src.duration / SL), q = [];
+    for (let k = 0, next = 0; k < n; k++) {
+      while (q.length < 3 && next < n) {
+        const a = next++ * SL, p = Media.decodeMono(src, a, Math.min(src.duration, a + SL), ctx);
+        p.catch(() => {}); // surfaced by the await below; avoids unhandled rejections for queued slices
+        q.push(p);
+      }
+      an.push(await q.shift());
+      progress((k + 1) / n);
+      say(`노래 냄새 맡는 중… ${Math.floor((k + 1) / n * 100)}%`);
+    }
+    return an.result();
+  }
+
+  function probeDuration(file) {
+    return new Promise((resolve) => {
+      const url = URL.createObjectURL(file), a = document.createElement("audio");
+      const done = (d) => { URL.revokeObjectURL(url); a.removeAttribute("src"); resolve(d); };
+      const timer = setTimeout(() => done(0), 8000);
+      a.preload = "metadata";
+      a.onloadedmetadata = () => { clearTimeout(timer); done(isFinite(a.duration) ? a.duration : 0); };
+      a.onerror = () => { clearTimeout(timer); done(0); };
+      a.setAttribute("src", url);
+    });
+  }
+  // Fallback path for containers we can't index: decode everything at a memory-safe rate.
+  async function decodeWhole(file) {
+    const dur = await probeDuration(file), est = dur || file.size * 8 / 64000; // unknown length: assume 64 kbps (= long)
+    const rate = RATES.find((r) => est * r * 2 * 4 <= MEM_BUDGET) || RATES[RATES.length - 1];
+    say(`소리 풀어보는 중… ${dur ? "(" + fmtLong(dur) + "짜리라 " : "("}조금 걸릴 수 있어요)`);
+    // Out-of-memory and unsupported formats both surface as decode errors: step the rate down
+    // (each attempt needs a fresh copy; decodeAudioData detaches its input) before giving up.
+    let buf = null;
+    for (const r of RATES.filter((x) => x <= rate)) {
+      try { buf = await new OfflineAudioContext(1, 1, r).decodeAudioData(await file.arrayBuffer()); break; }
+      catch (_) { /* try a lower rate */ }
+    }
+    if (!buf) throw new Error("이 파일은 브라우저가 못 읽어요. m4a·mp3·wav로 바꿔서 다시 올려 주세요.");
+    const chs = Array.from({ length: buf.numberOfChannels }, (_, i) => buf.getChannelData(i));
+    const d = A2M.analysisFactor(buf.sampleRate), an = new A2M.FrameAnalyzer(buf.sampleRate / d);
+    const step = d * Math.floor(buf.sampleRate * 30 / d);
+    for (let p = 0; p < buf.length; p += step) {
+      an.push(A2M.decimateMono(chs, p, Math.min(buf.length, p + step), d));
+      progress(p / buf.length);
+      say(`노래 냄새 맡는 중… ${Math.floor(p / buf.length * 100)}%`);
+      await tick();
+    }
+    return { src: Media.pcmSource(buf), feat: an.result() };
+  }
+
+  async function handleFile(file) {
+    if (!file || st.busy) return;
+    st.busy = true;
+    stopPlay();
+    clearZipLink();
+    st.src = st.feat = st.det = null; st.segs = []; ui.result.hidden = true;
+    st.name = file.name.replace(/\.[^.]+$/, "").replace(/[\\/:*?"<>|]+/g, "_") || "audio";
+    try {
+      say("파일 살펴보는 중…"); progress(-1);
+      let src = await Media.open(file), feat = null;
+      if (src) {
+        try { feat = await analyzeSlices(src); } catch (_) { src = null; } // codec not decodable in slices
+      }
+      if (!src) ({ src, feat } = await decodeWhole(file));
+      st.src = src; st.feat = feat;
+      progress(null);
+      runDetect();
+    } catch (err) {
+      progress(null);
+      say(err.message || "뭔가 잘못됐어요. 다시 시도해 주세요.");
+    } finally {
+      st.busy = false;
+      ui.file.value = "";
+    }
+  }
+
+  function runDetect() {
+    if (!st.feat) return;
+    stopPlay();
+    clearZipLink();
+    const opts = { minSong: +ui.minSong.value || A2M.DEFAULTS.minSong, gap: +ui.gap.value || A2M.DEFAULTS.gap, sens: +ui.sens.value || 0 };
+    st.det = A2M.detect(st.feat, opts);
+    const dur = st.src.duration;
+    st.segs = st.det.segments.map((s) => ({ start: s.start, end: Math.min(dur, s.end), on: true }));
+    const music = st.segs.reduce((a, s) => a + s.end - s.start, 0);
+    say(st.segs.length ? `노래 ${st.segs.length}곡 찾았어요!` : "노래를 못 찾았어요. 세부 설정에서 감도를 너그럽게 올려 보세요.");
+    ui.brag.textContent = `전체 ${fmtLong(dur)} 중 노래 ${fmtLong(music)}. 대사·잡음 ${fmtLong(dur - music)}는 가차 없이 버렸어요.`;
+    ui.fmtNote.textContent = st.src.kind === "pcm"
+      ? `저장 형식: WAV (${st.src.buffer.sampleRate / 1000}kHz${st.src.buffer.sampleRate < 44100 ? ", 긴 파일이라 메모리 아끼려고 낮춤" : ""}).`
+      : `저장 형식: 원본과 같은 ${st.src.ext.toUpperCase()} (다시 인코딩하지 않아 음질 그대로).`;
+    ui.tlEnd.textContent = fmt(dur).replace(/\.\d$/, "");
+    ui.result.hidden = false;
+    renderList();
+    draw();
+  }
+
+  const canShare = (f) => { try { return !!(navigator.canShare && navigator.canShare({ files: [f] })); } catch (_) { return false; } };
+
+  function renderList() {
+    ui.segs.textContent = "";
+    const dur = st.src.duration;
+    const shareable = canShare(new File([new Blob()], `x.${st.src.ext}`, { type: st.src.mime }));
+    st.segs.forEach((s, i) => {
+      const li = document.createElement("li");
+      li.className = s.on ? "" : "off";
+      if (st.play && st.play.idx === i) li.classList.add("playing");
+      const chk = document.createElement("input");
+      chk.type = "checkbox"; chk.checked = s.on; chk.setAttribute("aria-label", `${i + 1}번 곡 ZIP에 포함`);
+      chk.onchange = () => { s.on = chk.checked; li.className = s.on ? "" : "off"; clearZipLink(); ui.zip.disabled = !st.segs.some((x) => x.on); draw(); };
+      const num = document.createElement("span"); num.className = "n"; num.textContent = `#${i + 1}`;
+      const mk = (label, key) => {
+        const l = document.createElement("label"); l.className = "t";
+        const inp = document.createElement("input"); inp.type = "text"; inp.value = fmt(s[key]); inp.inputMode = "decimal";
+        inp.setAttribute("aria-label", `${i + 1}번 곡 ${label} 시간`);
+        inp.onchange = () => {
+          const t = parseTime(inp.value);
+          if (isFinite(t) && t <= dur) s[key] = t;
+          if (s.end - s.start < 1) s[key] = key === "start" ? Math.max(0, s.end - 1) : Math.min(dur, s.start + 1);
+          clearZipLink(); renderList(); draw();
+        };
+        l.append(label, inp);
+        return l;
+      };
+      const len = document.createElement("span"); len.className = "len"; len.textContent = `(${fmt(s.end - s.start).replace(/\.\d$/, "")})`;
+      const acts = document.createElement("span"); acts.className = "acts";
+      const btn = (txt, aria, fn, cls) => { const b = document.createElement("button"); b.type = "button"; b.textContent = txt; b.setAttribute("aria-label", aria); if (cls) b.className = cls; b.onclick = fn; return b; };
+      const playing = st.play && st.play.idx === i;
+      acts.append(
+        btn(playing ? "■" : "▶", playing ? `${i + 1}번 곡 정지` : `${i + 1}번 곡 미리듣기`, () => playing ? stopPlay() : playFrom(s.start, s.end, i)),
+        btn("끝 10초", `${i + 1}번 곡 마지막 10초 듣기`, () => playFrom(Math.max(s.start, s.end - 10), s.end, i), "secondary"),
+        btn("저장", `${i + 1}번 곡 저장`, () => saveOne(i)),
+      );
+      if (shareable) acts.append(btn("공유", `${i + 1}번 곡 공유 (파일에 저장·메신저)`, () => shareOne(i), "secondary"));
+      acts.append(btn("✕", `${i + 1}번 구간 삭제`, () => { if (st.play && st.play.idx === i) stopPlay(); st.segs.splice(i, 1); clearZipLink(); renderList(); draw(); }, "secondary"));
+      li.append(chk, num, mk("시작", "start"), mk("끝", "end"), len, acts);
+      ui.segs.append(li);
+    });
+    ui.zip.disabled = !st.segs.some((s) => s.on);
+  }
+
+  // Timeline: bars = music score per second (purple inside a kept song, grey elsewhere),
+  // outlines = song ranges (dashed when unchecked), pink line = playhead.
+  function draw() {
+    const cv = ui.tl, dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+    if (!w || !st.det) return;
+    cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+    const g = cv.getContext("2d"), dur = st.src.duration, css = getComputedStyle(document.documentElement);
+    g.scale(dpr, dpr); g.clearRect(0, 0, w, h);
+    const sc = st.det.score, cols = Math.min(sc.length, Math.floor(w)), grey = css.getPropertyValue("--muted").trim() || "#888";
+    for (let x = 0; x < cols; x++) {
+      const a = Math.floor(x / cols * sc.length), b = Math.max(a + 1, Math.floor((x + 1) / cols * sc.length));
+      let m = 0; for (let i = a; i < b; i++) m += sc[i];
+      const v = (m / (b - a) + 1) / 2, bh = Math.max(1, v * (h - 8)), mid = (a + b) / 2;
+      const inSong = st.segs.some((s) => s.on && mid >= s.start && mid < s.end);
+      g.fillStyle = inSong ? "#6c5ce7" : grey; g.globalAlpha = inSong ? 1 : 0.45;
+      g.fillRect(x * w / cols, h - 4 - bh, Math.max(1, w / cols - 0.5), bh);
+    }
+    g.globalAlpha = 1; g.strokeStyle = "#6c5ce7"; g.lineWidth = 2;
+    st.segs.forEach((s) => {
+      g.setLineDash(s.on ? [] : [4, 3]);
+      g.strokeRect(s.start / dur * w, 1, Math.max(1, (s.end - s.start) / dur * w), h - 2);
+    });
+    g.setLineDash([]);
+    const t = curTime();
+    g.fillStyle = "#e84393"; g.fillRect(t / dur * w - 1, 0, 2, h);
+  }
+
+  // Playback through <audio> (not Web Audio): plays with the iPhone silent switch on, and the clip
+  // is built synchronously so play() stays inside the tap gesture.
+  function curTime() { return st.play ? Math.min(st.play.end, st.play.base + player.currentTime) : st.cursor; }
+  function playFrom(t0, t1, idx) {
+    stopPlay();
+    const c = st.src.cut(t0, t1), url = URL.createObjectURL(c.blob);
+    st.play = { base: c.t0, end: c.t1, idx, url };
+    player.src = url;
+    player.onended = () => { if (st.play && st.play.url === url) stopPlay(); };
+    player.play().catch(() => { if (st.play && st.play.url === url) { stopPlay(); say("재생이 막혔어요. 한 번 더 눌러 주세요."); } });
+    if (idx != null) renderList();
+    const loop = () => { if (!st.play || st.play.url !== url) return; draw(); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+  }
+  function stopPlay() {
+    const was = st.play;
+    if (was) { st.cursor = curTime(); player.pause(); player.removeAttribute("src"); player.load(); URL.revokeObjectURL(was.url); }
+    st.play = null;
+    if (was && was.idx != null) renderList();
+    draw();
+  }
+
+  const fileName = (i) => `${st.name}_${pad(i + 1, 2)}_${fmt(st.segs[i].start).replace(/[:.]/g, "-")}.${st.src.ext}`;
+  function download(blob, name) {
+    const url = URL.createObjectURL(blob), a = document.createElement("a");
+    a.href = url; a.download = name; document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5 * 60000); // mobile browsers may start the transfer late
+  }
+  function saveOne(i) {
+    const s = st.segs[i];
+    download(st.src.cut(s.start, s.end).blob, fileName(i));
+  }
+  function shareOne(i) {
+    const s = st.segs[i], f = new File([st.src.cut(s.start, s.end).blob], fileName(i), { type: st.src.mime });
+    navigator.share({ files: [f], title: f.name }).catch((e) => { if (e && e.name !== "AbortError") download(f, f.name); });
+  }
+
+  function clearZipLink() {
+    if (st.zipUrl) URL.revokeObjectURL(st.zipUrl);
+    st.zipUrl = ""; ui.zipLink.hidden = true; ui.zipLink.removeAttribute("href");
+  }
+  // Building the ZIP is async (CRC needs the bytes), which ends the tap gesture; mobile browsers may
+  // then ignore an automatic download, so a real link is left for a fresh tap.
+  async function saveZip() {
+    const idx = st.segs.map((s, i) => s.on ? i : -1).filter((i) => i >= 0);
+    if (!idx.length) return;
+    clearZipLink();
+    ui.zip.disabled = true;
+    try {
+      const files = idx.map((i) => ({ name: fileName(i), blob: st.src.cut(st.segs[i].start, st.segs[i].end).blob }));
+      const blob = await Media.zip(files, (k) => { say(`ZIP 포장 중… ${k + 1}/${idx.length}`); progress(k / idx.length); });
+      const name = `${st.name}_노래${idx.length}곡.zip`;
+      st.zipUrl = URL.createObjectURL(blob);
+      ui.zipLink.href = st.zipUrl; ui.zipLink.download = name;
+      ui.zipLink.textContent = `ZIP 받기 (${mb(blob.size)})`; ui.zipLink.hidden = false;
+      if (!MOBILE) ui.zipLink.click();
+      say(MOBILE ? `ZIP 준비 완료! (${idx.length}곡) 'ZIP 받기'를 눌러 저장하세요.` : `ZIP 저장 완료! (${idx.length}곡)`);
+    } catch (_) {
+      say("ZIP을 만들지 못했어요. 곡을 하나씩 저장해 주세요.");
+    } finally { progress(null); ui.zip.disabled = false; }
+  }
+
+  ui.file.addEventListener("change", () => handleFile(ui.file.files[0]));
+  ["dragenter", "dragover"].forEach((ev) => ui.drop.addEventListener(ev, (e) => { e.preventDefault(); ui.drop.classList.add("over"); }));
+  ["dragleave", "drop"].forEach((ev) => ui.drop.addEventListener(ev, (e) => { e.preventDefault(); ui.drop.classList.remove("over"); }));
+  ui.drop.addEventListener("drop", (e) => handleFile(e.dataTransfer.files[0]));
+  let debounce = 0;
+  [ui.minSong, ui.gap, ui.sens].forEach((el) => el.addEventListener("input", () => { clearTimeout(debounce); debounce = setTimeout(runDetect, 250); }));
+  ui.zip.addEventListener("click", saveZip);
+  ui.stop.addEventListener("click", stopPlay);
+  ui.add.addEventListener("click", () => {
+    if (!st.src) return;
+    const dur = st.src.duration, start = Math.min(st.cursor, Math.max(0, dur - 1));
+    st.segs.push({ start, end: Math.min(dur, start + 180), on: true });
+    st.segs.sort((a, b) => a.start - b.start);
+    clearZipLink(); renderList(); draw();
+    say(`${fmt(start)}부터 3분짜리 구간을 추가했어요. 시작·끝을 고쳐 주세요.`);
+  });
+  ui.tl.addEventListener("click", (e) => {
+    if (!st.src) return;
+    const dur = st.src.duration, r = ui.tl.getBoundingClientRect();
+    st.cursor = Math.max(0, Math.min(dur, (e.clientX - r.left) / r.width * dur));
+    // The decoded fallback renders WAV on the fly, so keep that clip short.
+    playFrom(st.cursor, Math.min(dur, st.cursor + (st.src.kind === "pcm" ? 120 : 600)), null);
+  });
+  window.addEventListener("resize", draw);
+})();
+</script>
+</body>
+</html>
