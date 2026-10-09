@@ -2,114 +2,220 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="긴 녹음 파일(m4a·mp3 등)에서 노래 구간만 자동으로 찾아 곡별로 잘라 저장합니다. 파일은 기기 밖으로 나가지 않아요.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="description" content="긴 녹음 파일(음성 메모·m4a·mp3 등)에서 노래 구간만 자동으로 찾아 곡별로 잘라 저장하고, 노래 이름도 찾아 붙여 줍니다.">
+<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <title>노래만 잘라주는 가위 · LMAO</title>
 <style>
-:root{color-scheme:light dark;--bg:#fafafa;--fg:#1a1a1a;--card:#fff;--muted:#666;--accent:#6c5ce7}
-@media(prefers-color-scheme:dark){:root{--bg:#141414;--fg:#f2f2f2;--card:#1e1e1e;--muted:#aaa}}
-*{box-sizing:border-box}body{margin:0;line-height:1.6;background:var(--bg);color:var(--fg);font-family:system-ui,-apple-system,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;display:flex;min-height:100vh;flex-direction:column;align-items:center}
-main{width:min(720px,94vw);margin:32px auto;flex:1}
-.card{background:var(--card);border:1px solid rgba(0,0,0,.08);border-radius:16px;padding:28px;text-align:center;box-shadow:0 4px 24px rgba(0,0,0,.06)}
-h1{font-size:1.6rem;margin:0 0 8px}p.sub{color:var(--muted);margin:0 0 20px}
-button{font:inherit;font-size:1.05rem;padding:12px 20px;border-radius:12px;border:1px solid rgba(0,0,0,.12);background:var(--accent);color:#fff;cursor:pointer;min-height:48px}
-button.secondary{background:transparent;color:var(--fg)}
-button:disabled{opacity:.5;cursor:not-allowed}
-button:focus-visible,a:focus-visible{outline:3px solid #007a63;outline-offset:2px}
-.row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
-footer{width:min(720px,94vw);padding:20px 0 32px;color:var(--muted);font-size:.85rem;text-align:center}
-.ad{border:1px dashed rgba(0,0,0,.25);border-radius:10px;padding:10px;margin-top:18px;font-size:.8rem}
-.back{display:inline-block;margin-bottom:14px;font-size:.9rem;color:var(--muted)}
-@media(prefers-color-scheme:dark){:focus-visible{outline-color:#00cec9}.card,button,.ad{border-color:rgba(255,255,255,.24)}}
-@media(prefers-reduced-motion:no-preference){.card{animation:lmao-pop .35s ease-out}button:active{transform:scale(.95)}}
-@keyframes lmao-pop{from{transform:translateY(8px) scale(.98);opacity:0}to{transform:none;opacity:1}}
-@media(prefers-reduced-motion:reduce){.card{animation:none!important}button:active{transform:none!important}*{transition:none!important;animation-duration:.01ms!important}}
-/* LMAO v3 toy layer */
-:root{--ink:#23212b;--paper:#f6f1e7;--card:#fffdf7}
-body{background:var(--paper);background-image:radial-gradient(rgba(35,33,43,.08) 1px,transparent 1px);background-size:22px 22px}
-.card{background:var(--card);border:2px solid var(--ink);border-radius:20px;box-shadow:5px 5px 0 var(--ink)}
-h1{font-weight:800;letter-spacing:-.02em;font-size:1.75rem}
-p.sub{line-height:1.7}
-button{border:2px solid var(--ink);border-radius:14px;box-shadow:3px 3px 0 var(--ink);transition:transform .08s,box-shadow .08s}
-button:active{transform:translate(2px,2px) scale(.98);box-shadow:1px 1px 0 var(--ink)}
-@media(prefers-color-scheme:dark){:root{--ink:#f0eadd;--paper:#17151d;--card:#232029}body{background-image:radial-gradient(rgba(240,234,221,.07) 1px,transparent 1px)}}
-.skip{position:absolute;left:-9999px;top:0;background:var(--fg);color:var(--bg);padding:10px 16px;z-index:99;border-radius:0 0 8px 0}.skip:focus{left:0;outline:3px solid #007a63}button:focus,a:focus,[tabindex]:focus,input:focus,label.drop:focus-within{outline:3px solid #007a63;outline-offset:2px}@media(prefers-color-scheme:dark){button:focus,a:focus,[tabindex]:focus,input:focus,label.drop:focus-within{outline-color:#00cec9}}
-/* app */
-.drop{display:block;border:2px dashed var(--ink);border-radius:16px;padding:26px 16px;cursor:pointer;background:rgba(108,92,231,.06)}
-.drop.over{background:rgba(108,92,231,.18)}
-.drop strong{display:block;font-size:1.1rem}
-.drop span{color:var(--muted);font-size:.9rem}
-.drop input{position:absolute;opacity:0;width:1px;height:1px}
-details{text-align:left;margin-top:16px;border:2px solid var(--ink);border-radius:14px;padding:10px 14px}
-summary{cursor:pointer;font-weight:700}
-.opt{display:grid;grid-template-columns:1fr auto;gap:6px 12px;align-items:center;margin-top:10px;font-size:.92rem}
-.opt input[type=number]{width:6.5em;font:inherit;font-size:16px;padding:6px 8px;border-radius:8px;border:2px solid var(--ink);background:var(--card);color:var(--fg)}
-.opt input[type=range]{width:12em}
-.opt small{grid-column:1/-1;color:var(--muted);margin-top:-4px}
-#status{min-height:1.6em;margin:16px 0 6px;font-weight:600}
-progress{width:100%;height:14px;accent-color:var(--accent)}
-#result{margin-top:18px}
-#result[hidden],progress[hidden]{display:none}
-.brag{background:rgba(108,92,231,.1);border-radius:12px;padding:10px 12px;margin:0 0 12px}
-canvas{display:block;width:100%;height:90px;border:2px solid var(--ink);border-radius:12px;cursor:crosshair;background:var(--card)}
-.legend{display:flex;justify-content:space-between;color:var(--muted);font-size:.8rem;margin-top:4px}
-ol.segs{list-style:none;padding:0;margin:14px 0 0;text-align:left}
-ol.segs li{border:2px solid var(--ink);border-radius:14px;padding:10px 12px;margin-top:10px;display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
-ol.segs li.off{opacity:.55}
-ol.segs li.playing{box-shadow:3px 3px 0 var(--accent)}
-.segs .n{font-weight:800;min-width:2.4em}
-.segs label.t{display:flex;align-items:center;gap:4px;font-size:.88rem;color:var(--muted)}
-.segs input[type=text]{width:6.2em;font:inherit;font-size:16px;font-variant-numeric:tabular-nums;padding:4px 6px;border-radius:8px;border:2px solid var(--ink);background:var(--card);color:var(--fg)}
-.segs input[type=checkbox]{width:22px;height:22px;accent-color:var(--accent)}
-.segs .len{font-variant-numeric:tabular-nums;font-size:.88rem}
-.segs .acts{margin-left:auto;display:flex;flex-wrap:wrap;gap:6px}
-.segs button{font-size:.9rem;padding:6px 10px;min-height:44px;min-width:44px;box-shadow:2px 2px 0 var(--ink)}
-.note{color:var(--muted);font-size:.85rem;margin-top:12px}
-a.btn{display:inline-flex;align-items:center;justify-content:center;font-size:1.05rem;padding:12px 20px;border-radius:14px;border:2px solid var(--ink);box-shadow:3px 3px 0 var(--ink);background:var(--accent);color:#fff;text-decoration:none;min-height:48px}
+/* Apple-style tokens (iOS system colors; secondary label darkened for 4.5:1 contrast) */
+:root{color-scheme:light dark;
+--bg:#F2F2F7;--card:#FFFFFF;--label:#000000;--label2:#6C6C70;--sep:rgba(60,60,67,.18);--fill:rgba(118,118,128,.12);--fill2:rgba(118,118,128,.2);
+--accent:#007AFF;--accent-tint:rgba(0,122,255,.12);--red:#FF3B30;--red-text:#D70015;--green:#248A3D;--on-accent:#FFFFFF;--focus:rgba(0,122,255,.55);
+--r-card:12px;--font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif}
+@media(prefers-color-scheme:dark){:root{
+--bg:#000000;--card:#1C1C1E;--label:#FFFFFF;--label2:#AEAEB2;--sep:rgba(84,84,88,.65);--fill:rgba(118,118,128,.24);--fill2:rgba(118,118,128,.36);
+--accent:#0A84FF;--accent-tint:rgba(10,132,255,.2);--red:#FF453A;--red-text:#FF6961;--green:#30D158;--focus:rgba(10,132,255,.7)}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--label);font:17px/1.42 var(--font);letter-spacing:-.01em;-webkit-font-smoothing:antialiased;
+padding:env(safe-area-inset-top) max(16px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(16px,env(safe-area-inset-left))}
+main,footer{max-width:640px;margin:0 auto}
+main{padding:12px 0 8px}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:8px}
+.skip{position:absolute;left:-9999px;top:0;background:var(--card);color:var(--accent);padding:10px 16px;z-index:9;border-radius:0 0 10px 0}.skip:focus{left:0}
+.back{display:inline-flex;align-items:center;gap:2px;min-height:44px;color:var(--accent);text-decoration:none;font-size:17px}
+.back::before{content:"‹";font-size:28px;line-height:1;margin:-3px 4px 0 -2px}
+h1{font-size:34px;line-height:1.2;font-weight:700;letter-spacing:-.02em;margin:4px 0 6px}
+.lede{color:var(--label2);margin:0 0 22px;font-size:15px;line-height:1.5}
+/* grouped list */
+.group{margin:0 0 28px}
+.gh{font-size:13px;font-weight:400;color:var(--label2);margin:0 16px 7px;letter-spacing:0}
+.gf{font-size:13px;color:var(--label2);margin:7px 16px 0;line-height:1.45}
+.cg{background:var(--card);border-radius:var(--r-card);overflow:hidden}
+.cell{display:flex;align-items:center;gap:12px;min-height:48px;padding:10px 16px;position:relative}
+.cell+.cell,.cg>*+*{box-shadow:inset 16px 1px 0 var(--card),inset 0 1px 0 var(--sep)}
+/* buttons */
+button,a.btn{font:inherit;font-size:15px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 16px;border:0;border-radius:999px;
+background:var(--fill);color:var(--accent);cursor:pointer;text-decoration:none;transition:opacity .15s,transform .15s}
+button.primary,a.btn{background:var(--accent);color:var(--on-accent)}
+button.danger{color:var(--red-text)}
+button:active,a.btn:active{opacity:.55}
+button:disabled{opacity:.35;cursor:not-allowed}
 a.btn[hidden]{display:none}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0}
+.toolbar .primary,.toolbar a.btn{flex:1 1 100%}
+.toolbar button:not(.primary){flex:1 1 0}
+/* import */
+.drop{display:flex;flex-direction:column;align-items:center;gap:4px;padding:26px 16px 22px;cursor:pointer;text-align:center;transition:background .15s}
+.drop.over{background:var(--accent-tint)}
+.drop input{position:absolute;opacity:0;width:1px;height:1px}
+.drop .ic{width:52px;height:52px;border-radius:14px;background:var(--accent);display:grid;place-items:center;margin-bottom:8px}
+.drop .ic svg{width:30px;height:30px;stroke:#fff;stroke-width:2.2;stroke-linecap:round;fill:none}
+.drop strong{font-size:17px;font-weight:600;color:var(--accent)}
+.drop .sub{font-size:13px;color:var(--label2)}
+.drop:focus-within{outline:3px solid var(--focus);outline-offset:-3px}
+details.dis>summary{list-style:none;display:flex;align-items:center;gap:12px;min-height:48px;padding:10px 16px;cursor:pointer}
+details.dis>summary::-webkit-details-marker{display:none}
+details.dis>summary::after{content:"";margin-left:auto;width:8px;height:8px;border:solid var(--label2);border-width:0 2px 2px 0;transform:rotate(-45deg);transition:transform .2s;opacity:.7}
+details.dis[open]>summary::after{transform:rotate(45deg)}
+details.dis>summary .ic{width:30px;height:30px;border-radius:7px;background:#FF3B30;display:grid;place-items:center;flex:none}
+details.dis>summary .ic svg{width:18px;height:18px;stroke:#fff;stroke-width:2.4;stroke-linecap:round;fill:none}
+.guide{padding:2px 16px 16px}
+.segctl{display:flex;background:var(--fill);border-radius:9px;padding:2px;margin:4px 0 14px}
+.osr{position:absolute;opacity:0;pointer-events:none}
+.segctl label{flex:1;text-align:center;font-size:13px;font-weight:600;padding:7px 0;border-radius:7px;cursor:pointer;color:var(--label)}
+#osIos:checked~.segctl [for=osIos],#osMac:checked~.segctl [for=osMac]{background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04)}
+@media(prefers-color-scheme:dark){#osIos:checked~.segctl [for=osIos],#osMac:checked~.segctl [for=osMac]{background:#636366}}
+#osIos:focus-visible~.segctl [for=osIos],#osMac:focus-visible~.segctl [for=osMac]{outline:3px solid var(--focus)}
+.pane{display:none}
+#osIos:checked~.panes .p-ios,#osMac:checked~.panes .p-mac{display:block}
+ol.steps{margin:0;padding:0;list-style:none;counter-reset:s}
+ol.steps li{counter-increment:s;display:flex;gap:12px;align-items:flex-start;padding:7px 0;font-size:15px;line-height:1.45}
+ol.steps li::before{content:counter(s);flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:700;display:grid;place-items:center;margin-top:-1px}
+.kbd{display:inline-block;padding:0 6px;border-radius:6px;background:var(--fill);font-weight:600}
+.guide .tip{font-size:13px;color:var(--label2);margin:8px 0 0}
+/* status */
+#status{min-height:1.4em;margin:0 16px;font-size:15px;color:var(--label2)}
+#status:empty{display:none}
+progress{display:block;width:calc(100% - 32px);margin:10px 16px 0;height:4px;border:0;border-radius:2px;background:var(--fill2);-webkit-appearance:none;appearance:none;accent-color:var(--accent)}
+progress::-webkit-progress-bar{background:var(--fill2);border-radius:2px}
+progress::-webkit-progress-value{background:var(--accent);border-radius:2px}
+progress::-moz-progress-bar{background:var(--accent);border-radius:2px}
+#result[hidden],progress[hidden]{display:none}
+.statwrap{margin:-14px 0 28px}
+/* summary + timeline */
+.brag{margin:0;padding:14px 16px 4px;font-size:15px;color:var(--label2)}
+.tlwrap{padding:8px 16px 14px}
+canvas{display:block;width:100%;height:72px;border-radius:8px;cursor:pointer;background:var(--fill)}
+.legend{display:flex;justify-content:space-between;color:var(--label2);font-size:12px;margin-top:6px;font-variant-numeric:tabular-nums}
+/* song list */
+ol.segs{list-style:none;margin:0;padding:0}
+ol.segs li{padding:12px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:10px 12px;align-items:center}
+ol.segs li+li{box-shadow:inset 52px 1px 0 var(--card),inset 0 1px 0 var(--sep)}
+ol.segs li.off .meta,ol.segs li.off .times{opacity:.4}
+.segs input[type=checkbox]{-webkit-appearance:none;appearance:none;margin:0;width:24px;height:24px;border-radius:50%;border:2px solid #C7C7CC;display:grid;place-items:center;cursor:pointer;flex:none}
+@media(prefers-color-scheme:dark){.segs input[type=checkbox]{border-color:#636366}}
+.segs input[type=checkbox]:checked{background:var(--accent);border-color:var(--accent)}
+.segs input[type=checkbox]:checked::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:translateY(-1px) rotate(45deg)}
+.meta{min-width:0}
+.meta .ttl{font-size:17px;font-weight:600}
+.meta .len{font-size:13px;color:var(--label2);font-variant-numeric:tabular-nums}
+.segs .play{width:44px;height:44px;padding:0;border-radius:50%;background:var(--accent);color:#fff;font-size:15px}
+li.playing .play{background:var(--red)}
+.times{grid-column:2/4;display:flex;flex-wrap:wrap;gap:8px 16px}
+.times label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--label2)}
+.times input{width:6.4em;font:inherit;font-size:16px;font-variant-numeric:tabular-nums;padding:6px 10px;border:0;border-radius:8px;background:var(--fill);color:var(--label)}
+.acts{grid-column:2/4;display:flex;flex-wrap:wrap;gap:6px}
+.acts button{font-size:14px;min-height:36px;padding:0 13px}
+@media(pointer:coarse){.acts button{min-height:44px}}
+/* settings */
+.cell label{flex:1}
+.cell .val{display:flex;align-items:center;gap:6px;color:var(--label2);font-size:15px}
+.cell input[type=number]{width:4.6em;font:inherit;font-size:16px;text-align:right;padding:6px 10px;border:0;border-radius:8px;background:var(--fill);color:var(--label)}
+.cell.col{flex-direction:column;align-items:stretch;gap:6px}
+.slider{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--label2)}
+.slider input{flex:1;accent-color:var(--accent);min-height:32px}
+.opt{color:var(--label2);font-weight:400}
+.cell input.token{width:100%;font:inherit;font-size:16px;padding:8px 10px;border:0;border-radius:8px;background:var(--fill);color:var(--label)}
+.gf a{color:var(--accent)}
+input.switch{-webkit-appearance:none;appearance:none;margin:0;flex:none;width:51px;height:31px;border-radius:999px;background:var(--fill2);position:relative;cursor:pointer;transition:background .2s}
+input.switch::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.15),0 1px 1px rgba(0,0,0,.16);transition:transform .2s}
+input.switch:checked{background:#34C759}
+input.switch:checked::after{transform:translateX(20px)}
+.times label.nm{flex:1 1 100%}
+.times input.name{flex:1;width:auto;min-width:0}
+.meta .ttl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.meta .len .tag{color:var(--accent)}
+.meta .len .bad{color:var(--red-text)}
+.segs .play svg{width:14px;height:14px;fill:currentColor}
+footer{color:var(--label2);font-size:13px;text-align:center;padding:4px 0 28px}
+footer a{color:var(--accent)}
+.ad{border:1px dashed var(--sep);border-radius:10px;padding:10px;margin-top:14px;font-size:12px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body><a class="skip" href="#maincontent">본문 바로가기</a>
-<main id="maincontent"><div class="card">
+<main id="maincontent">
 <h1>노래만 잘라주는 가위</h1>
-<p class="sub">대사 나왔다가 노래 나왔다가 하는 긴 녹음(드라마·라디오·뮤지컬 등)을 올리면 노래 구간만 찾아서 곡별로 잘라 드려요.<br>대사는 가차 없이 버립니다. 파일은 이 기기 밖으로 한 발짝도 안 나가요.</p>
+<p class="lede">대사와 노래가 번갈아 나오는 긴 녹음에서 노래만 찾아 곡별로 잘라 드리고, 노래 이름도 찾아 붙여 드려요. 녹음 파일은 이 기기 밖으로 나가지 않아요. 노래 이름을 찾을 때만 곡마다 15초 조각을 음악 인식 서비스(AudD)로 보내요.</p>
 
+<section class="group" aria-labelledby="hImport">
+<h2 class="gh" id="hImport">녹음 가져오기</h2>
+<div class="cg">
 <label class="drop" id="drop">
-<input type="file" id="file" accept="audio/*,video/mp4,.m4a,.mp3,.aac,.wav,.flac,.ogg,.opus,.webm,.mp4">
-<strong>여기를 눌러 파일 고르기</strong>
-<span>또는 파일을 끌어다 놓기 · m4a, mp3, wav, aac, flac, ogg 등</span>
+<input type="file" id="file" accept="audio/*,.m4a,.qta,.mp3,.aac,.wav,.flac,.ogg,.opus">
+<span class="ic" aria-hidden="true"><svg viewBox="0 0 30 30"><path d="M5 12v6M10 8v14M15 4v22M20 9v12M25 13v4"/></svg></span>
+<strong>파일 선택</strong>
+<span class="sub">음성 메모 · m4a · mp3 · wav 등 · 끌어다 놓아도 돼요</span>
 </label>
-
-<details>
-<summary>세부 설정</summary>
-<div class="opt">
-<label for="minSong">최소 곡 길이 (초)</label><input type="number" id="minSong" min="10" max="900" step="5" value="60">
-<small>이보다 짧은 음악(징글·효과음)은 버려요.</small>
-<label for="gap">곡 사이 무음 (초)</label><input type="number" id="gap" min="0.5" max="10" step="0.1" value="2">
-<small>대사 없이 노래끼리 붙어 있을 때, 사이 무음이 이만큼 길면 다른 곡으로 나눠요.</small>
-<label for="sens">감도: 엄격 ↔ 너그럽게</label><input type="range" id="sens" min="-3" max="3" step="1" value="0">
-<small>노래를 놓치면 너그럽게, 말소리까지 잡히면 엄격하게.</small>
+<details class="dis" id="vmGuide">
+<summary><span class="ic" aria-hidden="true"><svg viewBox="0 0 18 18"><path d="M3 7v4M6.5 4.5v9M10 2.5v13M13.5 5.5v7"/></svg></span>음성 메모에서 가져오기</summary>
+<div class="guide">
+<input class="osr" type="radio" name="os" id="osIos" checked><input class="osr" type="radio" name="os" id="osMac">
+<div class="segctl"><label for="osIos">iPhone · iPad</label><label for="osMac">Mac</label></div>
+<div class="panes">
+<ol class="steps pane p-ios">
+<li><span><b>음성 메모</b> 앱에서 녹음을 탭하세요.</span></li>
+<li><span><span class="kbd">⋯</span> 버튼을 누르고 <b>공유</b>를 탭하세요.</span></li>
+<li><span>목록을 내려 <b>파일에 저장</b>을 탭하고, 위치를 골라 <b>저장</b>하세요.</span></li>
+<li><span>여기서 <b>파일 선택</b>을 누르고 방금 저장한 녹음을 고르세요.</span></li>
+</ol>
+<ol class="steps pane p-mac">
+<li><span><b>음성 메모</b> 앱을 여세요.</span></li>
+<li><span>녹음을 <b>Finder 창이나 데스크탑</b>으로 끌어다 놓아 파일로 꺼내세요.</span></li>
+<li><span>그 파일을 위 상자로 끌어다 놓거나 <b>파일 선택</b>으로 고르세요.</span></li>
+</ol>
+</div>
+<p class="tip">음성 메모 앱은 웹페이지에 녹음을 바로 넘겨줄 수 없어서, 파일로 한 번 저장하는 단계가 필요해요. 공유 옵션은 기본값(m4a) 그대로 두면 돼요.</p>
 </div>
 </details>
+</div>
+</section>
 
+<div class="statwrap">
 <p id="status" role="status" aria-live="polite"></p>
 <progress id="prog" max="1" value="0" hidden></progress>
-
-<section id="result" hidden aria-label="찾은 노래">
-<p class="brag" id="brag"></p>
-<canvas id="tl" aria-label="전체 타임라인. 누르면 그 지점부터 재생" role="img"></canvas>
-<div class="legend"><span>0:00</span><span>보라색 = 노래 · 누르면 거기부터 재생</span><span id="tlEnd"></span></div>
-<div class="row">
-<button id="zipBtn" type="button">선택한 곡 전부 저장 (ZIP)</button>
-<a id="zipLink" class="btn" hidden></a>
-<button id="stopBtn" type="button" class="secondary">■ 정지</button>
-<button id="addBtn" type="button" class="secondary">+ 구간 직접 추가</button>
 </div>
-<ol class="segs" id="segs"></ol>
-<p class="note"><span id="fmtNote"></span> 시작·끝 시간은 직접 고칠 수 있어요 (예: 3:21.5). 설정을 바꾸면 다시 찾으면서 수정한 구간은 초기화돼요.</p>
+
+<section id="result" hidden aria-labelledby="hResult">
+<div class="group">
+<h2 class="gh" id="hResult">찾은 노래</h2>
+<div class="cg">
+<p class="brag" id="brag"></p>
+<div class="tlwrap">
+<canvas id="tl" aria-label="전체 타임라인. 누르면 그 지점부터 재생" role="img"></canvas>
+<div class="legend"><span>0:00</span><span>파란색 = 노래 · 눌러서 그 지점부터 재생</span><span id="tlEnd"></span></div>
+</div>
+</div>
+<div class="toolbar">
+<button id="zipBtn" type="button" class="primary">선택한 곡 모두 저장 (ZIP)</button>
+<a id="zipLink" class="btn" hidden></a>
+<button id="stopBtn" type="button">정지</button>
+<button id="addBtn" type="button">구간 추가</button>
+</div>
+</div>
+<div class="group">
+<h2 class="gh">곡 목록</h2>
+<ol class="segs cg" id="segs"></ol>
+<p class="gf"><span id="fmtNote"></span> 시작·끝 시간은 직접 고칠 수 있어요(예: 3:21.5). 설정을 바꾸면 다시 찾으면서 고친 구간은 초기화돼요.</p>
+</div>
 </section>
-</div></main>
-<footer>무료 · 로그인 없음 · 파일은 기기 밖으로 안 나가요</footer>
+
+<section class="group" aria-labelledby="hSet">
+<h2 class="gh" id="hSet">설정</h2>
+<div class="cg">
+<div class="cell"><label for="minSong">최소 곡 길이</label><span class="val"><input type="number" id="minSong" min="10" max="900" step="5" value="60" inputmode="numeric">초</span></div>
+<div class="cell"><label for="gap">곡 사이 무음</label><span class="val"><input type="number" id="gap" min="0.5" max="10" step="0.1" value="2" inputmode="decimal">초</span></div>
+<div class="cell"><label for="autoName">노래 이름 자동으로 찾기</label><input type="checkbox" class="switch" id="autoName" role="switch" checked></div>
+<div class="cell col"><label for="auddToken">AudD 토큰 <span class="opt">(선택)</span></label><input type="text" id="auddToken" class="token" placeholder="없으면 무료 체험 한도까지만 돼요" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
+<div class="cell col"><label for="sens">감도</label><div class="slider"><span aria-hidden="true">엄격</span><input type="range" id="sens" min="-3" max="3" step="1" value="0" aria-valuetext="보통"><span aria-hidden="true">너그럽게</span></div></div>
+</div>
+<p class="gf">최소 곡 길이보다 짧은 음악(징글·효과음)은 빼요. 노래끼리 붙어 있을 때 사이 무음이 이만큼 길면 다른 곡으로 나눠요. 노래를 놓치면 너그럽게, 말소리까지 잡히면 엄격하게.</p>
+<p class="gf">노래 이름은 <a href="https://dashboard.audd.io/" target="_blank" rel="noopener">AudD</a>가 찾아요. 토큰 없이는 하루 몇 곡까지만 돼요. 무료 가입하면 300곡까지 무료(이후 1,000곡당 $5)예요. 토큰은 이 기기에만 저장돼요.</p>
+</section>
+</main>
+<footer>무료 · 로그인 없음</footer>
 
 <script id="a2m-core">
 "use strict";
@@ -704,14 +810,15 @@ const Media = (() => {
 "use strict";
 (() => {
   const $ = (id) => document.getElementById(id);
-  const ui = { file: $("file"), drop: $("drop"), status: $("status"), prog: $("prog"), result: $("result"), brag: $("brag"), tl: $("tl"), tlEnd: $("tlEnd"), segs: $("segs"), zip: $("zipBtn"), zipLink: $("zipLink"), stop: $("stopBtn"), add: $("addBtn"), minSong: $("minSong"), gap: $("gap"), sens: $("sens"), fmtNote: $("fmtNote") };
-  const st = { name: "", src: null, feat: null, det: null, segs: [], play: null, cursor: 0, busy: false, zipUrl: "" };
+  const ui = { file: $("file"), drop: $("drop"), status: $("status"), prog: $("prog"), result: $("result"), brag: $("brag"), tl: $("tl"), tlEnd: $("tlEnd"), segs: $("segs"), zip: $("zipBtn"), zipLink: $("zipLink"), stop: $("stopBtn"), add: $("addBtn"), minSong: $("minSong"), gap: $("gap"), sens: $("sens"), fmtNote: $("fmtNote"), autoName: $("autoName"), token: $("auddToken") };
+  const st = { name: "", src: null, feat: null, det: null, segs: [], play: null, cursor: 0, busy: false, zipUrl: "", rec: { gen: 0, cache: [], blocked: "" } };
   const player = new Audio();
   const AR = 11025; // analysis sample rate
   // Fallback full decode only: float PCM budget (assumes stereo). Phones get far less memory per tab.
   const MOBILE = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
   const MEM_BUDGET = MOBILE ? 400e6 : 1.6e9;
   const RATES = [44100, 32000, 22050, 16000];
+  const store = { get: (k) => { try { return localStorage.getItem(k); } catch (_) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (_) { /* private mode */ } } };
 
   const pad = (x, w) => String(x).padStart(w, "0");
   function fmt(t) {
@@ -720,6 +827,7 @@ const Media = (() => {
     const ss = s.toFixed(1).padStart(4, "0");
     return h ? `${h}:${pad(m, 2)}:${ss}` : `${m}:${ss}`;
   }
+  const fmtShort = (t) => fmt(t).replace(/\.\d$/, "");
   function fmtLong(t) {
     t = Math.round(t);
     const h = Math.floor(t / 3600), m = Math.floor(t / 60) % 60, s = t % 60;
@@ -737,6 +845,7 @@ const Media = (() => {
     if (v === -1) ui.prog.removeAttribute("value"); else if (v != null) ui.prog.value = v;
   }
   const mb = (n) => `${(n / 1e6).toFixed(n < 1e7 ? 1 : 0)}MB`;
+  const cssVar = (k, d) => getComputedStyle(document.documentElement).getPropertyValue(k).trim() || d;
 
   // Fast path: decode 30 s slices (3 in flight) straight into the analyser.
   async function analyzeSlices(src) {
@@ -749,7 +858,7 @@ const Media = (() => {
       }
       an.push(await q.shift());
       progress((k + 1) / n);
-      say(`노래 냄새 맡는 중… ${Math.floor((k + 1) / n * 100)}%`);
+      say(`노래 구간 찾는 중… ${Math.floor((k + 1) / n * 100)}%`);
     }
     return an.result();
   }
@@ -769,7 +878,7 @@ const Media = (() => {
   async function decodeWhole(file) {
     const dur = await probeDuration(file), est = dur || file.size * 8 / 64000; // unknown length: assume 64 kbps (= long)
     const rate = RATES.find((r) => est * r * 2 * 4 <= MEM_BUDGET) || RATES[RATES.length - 1];
-    say(`소리 풀어보는 중… ${dur ? "(" + fmtLong(dur) + "짜리라 " : "("}조금 걸릴 수 있어요)`);
+    say(`오디오 여는 중…${dur ? ` (${fmtLong(dur)}짜리라 조금 걸릴 수 있어요)` : ""}`);
     // Out-of-memory and unsupported formats both surface as decode errors: step the rate down
     // (each attempt needs a fresh copy; decodeAudioData detaches its input) before giving up.
     let buf = null;
@@ -777,14 +886,14 @@ const Media = (() => {
       try { buf = await new OfflineAudioContext(1, 1, r).decodeAudioData(await file.arrayBuffer()); break; }
       catch (_) { /* try a lower rate */ }
     }
-    if (!buf) throw new Error("이 파일은 브라우저가 못 읽어요. m4a·mp3·wav로 바꿔서 다시 올려 주세요.");
+    if (!buf) throw new Error("이 파일은 브라우저가 읽을 수 없어요. m4a·mp3·wav 파일로 다시 시도해 주세요.");
     const chs = Array.from({ length: buf.numberOfChannels }, (_, i) => buf.getChannelData(i));
     const d = A2M.analysisFactor(buf.sampleRate), an = new A2M.FrameAnalyzer(buf.sampleRate / d);
     const step = d * Math.floor(buf.sampleRate * 30 / d);
     for (let p = 0; p < buf.length; p += step) {
       an.push(A2M.decimateMono(chs, p, Math.min(buf.length, p + step), d));
       progress(p / buf.length);
-      say(`노래 냄새 맡는 중… ${Math.floor(p / buf.length * 100)}%`);
+      say(`노래 구간 찾는 중… ${Math.floor(p / buf.length * 100)}%`);
       await tick();
     }
     return { src: Media.pcmSource(buf), feat: an.result() };
@@ -795,10 +904,11 @@ const Media = (() => {
     st.busy = true;
     stopPlay();
     clearZipLink();
+    st.rec.gen++; st.rec.cache = [];
     st.src = st.feat = st.det = null; st.segs = []; ui.result.hidden = true;
     st.name = file.name.replace(/\.[^.]+$/, "").replace(/[\\/:*?"<>|]+/g, "_") || "audio";
     try {
-      say("파일 살펴보는 중…"); progress(-1);
+      say("파일 여는 중…"); progress(-1);
       let src = await Media.open(file), feat = null;
       if (src) {
         try { feat = await analyzeSlices(src); } catch (_) { src = null; } // codec not decodable in slices
@@ -809,7 +919,7 @@ const Media = (() => {
       runDetect();
     } catch (err) {
       progress(null);
-      say(err.message || "뭔가 잘못됐어요. 다시 시도해 주세요.");
+      say(err.message || "문제가 생겼어요. 다시 시도해 주세요.");
     } finally {
       st.busy = false;
       ui.file.value = "";
@@ -823,20 +933,88 @@ const Media = (() => {
     const opts = { minSong: +ui.minSong.value || A2M.DEFAULTS.minSong, gap: +ui.gap.value || A2M.DEFAULTS.gap, sens: +ui.sens.value || 0 };
     st.det = A2M.detect(st.feat, opts);
     const dur = st.src.duration;
-    st.segs = st.det.segments.map((s) => ({ start: s.start, end: Math.min(dur, s.end), on: true }));
+    st.segs = st.det.segments.map((s) => ({ start: s.start, end: Math.min(dur, s.end), on: true, name: "", nameEdited: false, rec: "" }));
     const music = st.segs.reduce((a, s) => a + s.end - s.start, 0);
-    say(st.segs.length ? `노래 ${st.segs.length}곡 찾았어요!` : "노래를 못 찾았어요. 세부 설정에서 감도를 너그럽게 올려 보세요.");
-    ui.brag.textContent = `전체 ${fmtLong(dur)} 중 노래 ${fmtLong(music)}. 대사·잡음 ${fmtLong(dur - music)}는 가차 없이 버렸어요.`;
+    say(st.segs.length ? `노래 ${st.segs.length}곡을 찾았어요.` : "노래를 찾지 못했어요. 설정에서 감도를 너그럽게 바꿔 보세요.");
+    ui.brag.textContent = `전체 ${fmtLong(dur)} 중 노래 ${fmtLong(music)} · 나머지 ${fmtLong(dur - music)}는 뺐어요`;
     ui.fmtNote.textContent = st.src.kind === "pcm"
-      ? `저장 형식: WAV (${st.src.buffer.sampleRate / 1000}kHz${st.src.buffer.sampleRate < 44100 ? ", 긴 파일이라 메모리 아끼려고 낮춤" : ""}).`
-      : `저장 형식: 원본과 같은 ${st.src.ext.toUpperCase()} (다시 인코딩하지 않아 음질 그대로).`;
-    ui.tlEnd.textContent = fmt(dur).replace(/\.\d$/, "");
+      ? `WAV로 저장돼요(${st.src.buffer.sampleRate / 1000}kHz${st.src.buffer.sampleRate < 44100 ? ", 긴 파일이라 낮춤" : ""}).`
+      : `원본과 같은 ${st.src.ext.toUpperCase()}로 저장돼요(다시 인코딩하지 않아 음질 그대로).`;
+    ui.tlEnd.textContent = fmtShort(dur);
     ui.result.hidden = false;
     renderList();
     draw();
+    recognizeAll();
+  }
+
+  // ---- Song names via AudD (https://docs.audd.io): one 15 s clip per song, a second window if
+  // the first finds nothing. Clips are cached by position so re-detection doesn't resend them.
+  const CLIP = 15;
+  function applyMatch(s, m) {
+    s.rec = "ok"; s.artist = m.artist || ""; s.title = m.title || "";
+    if (!s.nameEdited) s.name = [s.artist, s.title].filter(Boolean).join(" - ");
+  }
+  async function audd(blob) {
+    const fd = new FormData(), token = ui.token.value.trim();
+    if (token) fd.append("api_token", token);
+    fd.append("file", new File([blob], `clip.${st.src.ext}`, { type: st.src.mime }));
+    const res = await fetch("https://api.audd.io/", { method: "POST", body: fd, signal: AbortSignal.timeout(30000) });
+    const j = await res.json();
+    if (j.status !== "success") { const e = new Error((j.error && j.error.error_message) || "AudD error"); e.code = j.error && j.error.error_code; throw e; }
+    return j.result && j.result.title ? j.result : null;
+  }
+  async function recognizeOne(s, gen) {
+    const len = s.end - s.start, w = Math.min(CLIP, len), cache = st.rec.cache;
+    const hit = cache.find((c) => c.m && c.t >= s.start - 1 && c.t + c.w <= s.end + 1);
+    if (hit) { applyMatch(s, hit.m); return; }
+    for (const f of [0.5, 0.25]) {
+      const t = s.start + (len - w) * f;
+      // In-flight requests are shared, so a superseding pass never sends the same clip twice.
+      let c = cache.find((x) => Math.abs(x.t - t) < 2 && x.w === w);
+      if (!c) {
+        c = { t, w, m: null, p: audd(st.src.cut(t, t + w).blob) };
+        cache.push(c);
+        c.p.then((m) => { c.m = m; }, () => { cache.splice(cache.indexOf(c), 1); });
+      }
+      const m = await c.p;
+      if (gen !== st.rec.gen) return;
+      if (m) { applyMatch(s, m); return; }
+    }
+    s.rec = "none";
+  }
+  async function recognizeAll() {
+    if (!st.src || !ui.autoName.checked || st.rec.blocked) return;
+    const gen = ++st.rec.gen, todo = st.segs.filter((s) => s.rec !== "ok" && s.rec !== "none");
+    if (!todo.length) return;
+    todo.forEach((s) => { s.rec = "pending"; });
+    renderList();
+    let next = 0;
+    const worker = async () => {
+      while (next < todo.length && gen === st.rec.gen && !st.rec.blocked) {
+        const s = todo[next++];
+        try { await recognizeOne(s, gen); }
+        catch (e) {
+          s.rec = "error";
+          if (e.code === 901) st.rec.blocked = "무료 체험 한도를 다 썼어요. 설정에 AudD 토큰을 넣으면 계속 찾을 수 있어요.";
+          else if (e.code === 900) st.rec.blocked = "AudD 토큰이 올바르지 않아요. 설정에서 확인해 주세요.";
+        }
+        if (gen !== st.rec.gen) return;
+        if (st.segs.includes(s)) renderList();
+      }
+    };
+    await Promise.all([worker(), worker()]);
+    if (gen !== st.rec.gen) return;
+    todo.forEach((s) => { if (s.rec === "pending") s.rec = ""; });
+    const named = st.segs.filter((s) => s.rec === "ok").length, failed = st.segs.filter((s) => s.rec === "error").length;
+    say(st.rec.blocked || `노래 ${st.segs.length}곡 중 ${named}곡의 이름을 찾았어요.` +
+      (failed ? ` ${failed}곡은 연결 문제로 실패했어요. 설정의 '노래 이름 자동으로 찾기'를 껐다 켜면 다시 시도해요.` : ""));
+    renderList();
   }
 
   const canShare = (f) => { try { return !!(navigator.canShare && navigator.canShare({ files: [f] })); } catch (_) { return false; } };
+  const svg = (d) => `<svg viewBox="0 0 14 14" aria-hidden="true"><path d="${d}"/></svg>`;
+  const ICON_PLAY = svg("M3 1.5v11l9.5-5.5z"), ICON_STOP = svg("M2.5 2.5h9v9h-9z");
+  const REC_TEXT = { pending: ["tag", "이름 찾는 중…"], none: ["", "이름을 못 찾았어요"], error: ["bad", "이름 찾기 실패"] };
 
   function renderList() {
     ui.segs.textContent = "";
@@ -844,67 +1022,83 @@ const Media = (() => {
     const shareable = canShare(new File([new Blob()], `x.${st.src.ext}`, { type: st.src.mime }));
     st.segs.forEach((s, i) => {
       const li = document.createElement("li");
-      li.className = s.on ? "" : "off";
-      if (st.play && st.play.idx === i) li.classList.add("playing");
+      li.className = (s.on ? "" : "off") + (st.play && st.play.idx === i ? " playing" : "");
       const chk = document.createElement("input");
       chk.type = "checkbox"; chk.checked = s.on; chk.setAttribute("aria-label", `${i + 1}번 곡 ZIP에 포함`);
-      chk.onchange = () => { s.on = chk.checked; li.className = s.on ? "" : "off"; clearZipLink(); ui.zip.disabled = !st.segs.some((x) => x.on); draw(); };
-      const num = document.createElement("span"); num.className = "n"; num.textContent = `#${i + 1}`;
+      chk.onchange = () => { s.on = chk.checked; li.classList.toggle("off", !s.on); clearZipLink(); ui.zip.disabled = !st.segs.some((x) => x.on); draw(); };
+      const meta = document.createElement("div"); meta.className = "meta";
+      const ttl = document.createElement("div"); ttl.className = "ttl"; ttl.textContent = s.name || `${i + 1}번 곡`;
+      const sub = document.createElement("div"); sub.className = "len";
+      sub.textContent = `${i + 1}번 · ${fmtShort(s.start)}–${fmtShort(s.end)} · ${fmtShort(s.end - s.start)}`;
+      if (REC_TEXT[s.rec]) { const t = document.createElement("span"); t.className = REC_TEXT[s.rec][0]; t.textContent = ` · ${REC_TEXT[s.rec][1]}`; sub.append(t); }
+      meta.append(ttl, sub);
+      const playing = st.play && st.play.idx === i;
+      const play = document.createElement("button");
+      play.type = "button"; play.className = "play"; play.innerHTML = playing ? ICON_STOP : ICON_PLAY;
+      play.setAttribute("aria-label", playing ? `${i + 1}번 곡 정지` : `${i + 1}번 곡 미리듣기`);
+      play.onclick = () => playing ? stopPlay() : playFrom(s.start, s.end, i);
+
+      const times = document.createElement("div"); times.className = "times";
+      const nm = document.createElement("label"); nm.className = "nm";
+      const nameIn = document.createElement("input"); nameIn.type = "text"; nameIn.className = "name"; nameIn.value = s.name;
+      nameIn.placeholder = "노래 이름 (파일 이름이 돼요)"; nameIn.setAttribute("aria-label", `${i + 1}번 곡 이름`);
+      nameIn.onchange = () => { s.name = nameIn.value.trim(); s.nameEdited = true; ttl.textContent = s.name || `${i + 1}번 곡`; clearZipLink(); };
+      nm.append("이름", nameIn);
       const mk = (label, key) => {
-        const l = document.createElement("label"); l.className = "t";
+        const l = document.createElement("label");
         const inp = document.createElement("input"); inp.type = "text"; inp.value = fmt(s[key]); inp.inputMode = "decimal";
         inp.setAttribute("aria-label", `${i + 1}번 곡 ${label} 시간`);
         inp.onchange = () => {
           const t = parseTime(inp.value);
           if (isFinite(t) && t <= dur) s[key] = t;
           if (s.end - s.start < 1) s[key] = key === "start" ? Math.max(0, s.end - 1) : Math.min(dur, s.start + 1);
-          clearZipLink(); renderList(); draw();
+          if (s.rec !== "pending") s.rec = "";
+          clearZipLink(); renderList(); draw(); recognizeAll();
         };
         l.append(label, inp);
         return l;
       };
-      const len = document.createElement("span"); len.className = "len"; len.textContent = `(${fmt(s.end - s.start).replace(/\.\d$/, "")})`;
-      const acts = document.createElement("span"); acts.className = "acts";
+      times.append(nm, mk("시작", "start"), mk("끝", "end"));
+
+      const acts = document.createElement("div"); acts.className = "acts";
       const btn = (txt, aria, fn, cls) => { const b = document.createElement("button"); b.type = "button"; b.textContent = txt; b.setAttribute("aria-label", aria); if (cls) b.className = cls; b.onclick = fn; return b; };
-      const playing = st.play && st.play.idx === i;
       acts.append(
-        btn(playing ? "■" : "▶", playing ? `${i + 1}번 곡 정지` : `${i + 1}번 곡 미리듣기`, () => playing ? stopPlay() : playFrom(s.start, s.end, i)),
-        btn("끝 10초", `${i + 1}번 곡 마지막 10초 듣기`, () => playFrom(Math.max(s.start, s.end - 10), s.end, i), "secondary"),
+        btn("끝 10초", `${i + 1}번 곡 마지막 10초 듣기`, () => playFrom(Math.max(s.start, s.end - 10), s.end, i)),
         btn("저장", `${i + 1}번 곡 저장`, () => saveOne(i)),
       );
-      if (shareable) acts.append(btn("공유", `${i + 1}번 곡 공유 (파일에 저장·메신저)`, () => shareOne(i), "secondary"));
-      acts.append(btn("✕", `${i + 1}번 구간 삭제`, () => { if (st.play && st.play.idx === i) stopPlay(); st.segs.splice(i, 1); clearZipLink(); renderList(); draw(); }, "secondary"));
-      li.append(chk, num, mk("시작", "start"), mk("끝", "end"), len, acts);
+      if (shareable) acts.append(btn("공유", `${i + 1}번 곡 공유 (파일에 저장·메신저)`, () => shareOne(i)));
+      acts.append(btn("삭제", `${i + 1}번 구간 삭제`, () => { if (st.play && st.play.idx === i) stopPlay(); st.segs.splice(i, 1); clearZipLink(); renderList(); draw(); }, "danger"));
+      li.append(chk, meta, play, times, acts);
       ui.segs.append(li);
     });
     ui.zip.disabled = !st.segs.some((s) => s.on);
   }
 
-  // Timeline: bars = music score per second (purple inside a kept song, grey elsewhere),
-  // outlines = song ranges (dashed when unchecked), pink line = playhead.
+  // Timeline: bars = music score per second (accent inside a kept song, grey elsewhere),
+  // outlines = song ranges (dashed when unchecked), red line = playhead.
   function draw() {
     const cv = ui.tl, dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
     if (!w || !st.det) return;
     cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
-    const g = cv.getContext("2d"), dur = st.src.duration, css = getComputedStyle(document.documentElement);
+    const g = cv.getContext("2d"), dur = st.src.duration, accent = cssVar("--accent", "#007AFF"), grey = cssVar("--label2", "#888");
     g.scale(dpr, dpr); g.clearRect(0, 0, w, h);
-    const sc = st.det.score, cols = Math.min(sc.length, Math.floor(w)), grey = css.getPropertyValue("--muted").trim() || "#888";
+    const sc = st.det.score, cols = Math.min(sc.length, Math.floor(w / 2));
     for (let x = 0; x < cols; x++) {
       const a = Math.floor(x / cols * sc.length), b = Math.max(a + 1, Math.floor((x + 1) / cols * sc.length));
       let m = 0; for (let i = a; i < b; i++) m += sc[i];
-      const v = (m / (b - a) + 1) / 2, bh = Math.max(1, v * (h - 8)), mid = (a + b) / 2;
+      const v = (m / (b - a) + 1) / 2, bh = Math.max(2, v * (h - 12)), mid = (a + b) / 2;
       const inSong = st.segs.some((s) => s.on && mid >= s.start && mid < s.end);
-      g.fillStyle = inSong ? "#6c5ce7" : grey; g.globalAlpha = inSong ? 1 : 0.45;
-      g.fillRect(x * w / cols, h - 4 - bh, Math.max(1, w / cols - 0.5), bh);
+      g.fillStyle = inSong ? accent : grey; g.globalAlpha = inSong ? 1 : 0.35;
+      const bw = Math.max(1, w / cols - 1);
+      g.beginPath(); g.roundRect ? g.roundRect(x * w / cols, (h - bh) / 2, bw, bh, bw / 2) : g.rect(x * w / cols, (h - bh) / 2, bw, bh); g.fill();
     }
-    g.globalAlpha = 1; g.strokeStyle = "#6c5ce7"; g.lineWidth = 2;
+    g.globalAlpha = 1; g.strokeStyle = accent; g.lineWidth = 1.5;
     st.segs.forEach((s) => {
       g.setLineDash(s.on ? [] : [4, 3]);
-      g.strokeRect(s.start / dur * w, 1, Math.max(1, (s.end - s.start) / dur * w), h - 2);
+      g.beginPath(); g.roundRect ? g.roundRect(s.start / dur * w + 1, 1, Math.max(1, (s.end - s.start) / dur * w - 2), h - 2, 6) : g.rect(s.start / dur * w, 1, (s.end - s.start) / dur * w, h - 2); g.stroke();
     });
     g.setLineDash([]);
-    const t = curTime();
-    g.fillStyle = "#e84393"; g.fillRect(t / dur * w - 1, 0, 2, h);
+    g.fillStyle = cssVar("--red", "#FF3B30"); g.fillRect(curTime() / dur * w - 1, 0, 2, h);
   }
 
   // Playback through <audio> (not Web Audio): plays with the iPhone silent switch on, and the clip
@@ -929,7 +1123,11 @@ const Media = (() => {
     draw();
   }
 
-  const fileName = (i) => `${st.name}_${pad(i + 1, 2)}_${fmt(st.segs[i].start).replace(/[:.]/g, "-")}.${st.src.ext}`;
+  const safe = (x) => x.replace(/[\\/:*?"<>|\u0000-\u001f]+/g, "_").replace(/^[.\s]+|[.\s]+$/g, "").slice(0, 120);
+  function fileName(i) {
+    const s = st.segs[i], n = safe(s.name || "");
+    return n ? `${pad(i + 1, 2)} ${n}.${st.src.ext}` : `${st.name}_${pad(i + 1, 2)}_${fmt(s.start).replace(/[:.]/g, "-")}.${st.src.ext}`;
+  }
   function download(blob, name) {
     const url = URL.createObjectURL(blob), a = document.createElement("a");
     a.href = url; a.download = name; document.body.append(a); a.click(); a.remove();
@@ -941,7 +1139,7 @@ const Media = (() => {
   }
   function shareOne(i) {
     const s = st.segs[i], f = new File([st.src.cut(s.start, s.end).blob], fileName(i), { type: st.src.mime });
-    navigator.share({ files: [f], title: f.name }).catch((e) => { if (e && e.name !== "AbortError") download(f, f.name); });
+    navigator.share({ files: [f], title: s.name || f.name }).catch((e) => { if (e && e.name !== "AbortError") download(f, f.name); });
   }
 
   function clearZipLink() {
@@ -957,33 +1155,54 @@ const Media = (() => {
     ui.zip.disabled = true;
     try {
       const files = idx.map((i) => ({ name: fileName(i), blob: st.src.cut(st.segs[i].start, st.segs[i].end).blob }));
-      const blob = await Media.zip(files, (k) => { say(`ZIP 포장 중… ${k + 1}/${idx.length}`); progress(k / idx.length); });
+      const blob = await Media.zip(files, (k) => { say(`ZIP 만드는 중… ${k + 1}/${idx.length}`); progress(k / idx.length); });
       const name = `${st.name}_노래${idx.length}곡.zip`;
       st.zipUrl = URL.createObjectURL(blob);
       ui.zipLink.href = st.zipUrl; ui.zipLink.download = name;
       ui.zipLink.textContent = `ZIP 받기 (${mb(blob.size)})`; ui.zipLink.hidden = false;
       if (!MOBILE) ui.zipLink.click();
-      say(MOBILE ? `ZIP 준비 완료! (${idx.length}곡) 'ZIP 받기'를 눌러 저장하세요.` : `ZIP 저장 완료! (${idx.length}곡)`);
+      say(MOBILE ? `ZIP이 준비됐어요(${idx.length}곡). 'ZIP 받기'를 눌러 저장하세요.` : `ZIP을 저장했어요(${idx.length}곡).`);
     } catch (_) {
       say("ZIP을 만들지 못했어요. 곡을 하나씩 저장해 주세요.");
     } finally { progress(null); ui.zip.disabled = false; }
   }
+
+  // Settings persistence (this device only).
+  ui.token.value = store.get("a2m.auddToken") || "";
+  ui.autoName.checked = store.get("a2m.autoName") !== "0";
+  ui.token.addEventListener("change", () => {
+    store.set("a2m.auddToken", ui.token.value.trim());
+    st.rec.blocked = "";
+    recognizeAll();
+  });
+  ui.autoName.addEventListener("change", () => {
+    store.set("a2m.autoName", ui.autoName.checked ? "1" : "0");
+    if (ui.autoName.checked) { recognizeAll(); return; }
+    st.rec.gen++;
+    st.segs.forEach((s) => { if (s.rec === "pending") s.rec = ""; });
+    if (st.src) renderList();
+  });
+  if (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints < 2) $("osMac").checked = true;
+  const SENS = ["아주 엄격", "엄격", "조금 엄격", "보통", "조금 너그럽게", "너그럽게", "아주 너그럽게"];
+  const sensText = () => ui.sens.setAttribute("aria-valuetext", SENS[+ui.sens.value + 3]);
+  sensText();
 
   ui.file.addEventListener("change", () => handleFile(ui.file.files[0]));
   ["dragenter", "dragover"].forEach((ev) => ui.drop.addEventListener(ev, (e) => { e.preventDefault(); ui.drop.classList.add("over"); }));
   ["dragleave", "drop"].forEach((ev) => ui.drop.addEventListener(ev, (e) => { e.preventDefault(); ui.drop.classList.remove("over"); }));
   ui.drop.addEventListener("drop", (e) => handleFile(e.dataTransfer.files[0]));
   let debounce = 0;
-  [ui.minSong, ui.gap, ui.sens].forEach((el) => el.addEventListener("input", () => { clearTimeout(debounce); debounce = setTimeout(runDetect, 250); }));
+  [ui.minSong, ui.gap, ui.sens].forEach((el) => el.addEventListener("input", () => { sensText(); clearTimeout(debounce); debounce = setTimeout(runDetect, 250); }));
   ui.zip.addEventListener("click", saveZip);
   ui.stop.addEventListener("click", stopPlay);
   ui.add.addEventListener("click", () => {
     if (!st.src) return;
     const dur = st.src.duration, start = Math.min(st.cursor, Math.max(0, dur - 1));
-    st.segs.push({ start, end: Math.min(dur, start + 180), on: true });
+    st.segs.push({ start, end: Math.min(dur, start + 180), on: true, name: "", nameEdited: false, rec: "" });
     st.segs.sort((a, b) => a.start - b.start);
     clearZipLink(); renderList(); draw();
     say(`${fmt(start)}부터 3분짜리 구간을 추가했어요. 시작·끝을 고쳐 주세요.`);
+    recognizeAll();
   });
   ui.tl.addEventListener("click", (e) => {
     if (!st.src) return;
@@ -993,6 +1212,7 @@ const Media = (() => {
     playFrom(st.cursor, Math.min(dur, st.cursor + (st.src.kind === "pcm" ? 120 : 600)), null);
   });
   window.addEventListener("resize", draw);
+  matchMedia("(prefers-color-scheme: dark)").addEventListener("change", draw);
 })();
 </script>
 </body>
