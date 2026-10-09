@@ -11,11 +11,11 @@
 /* Apple-style tokens (iOS system colors; secondary label darkened for 4.5:1 contrast) */
 :root{color-scheme:light dark;
 --bg:#F2F2F7;--card:#FFFFFF;--label:#000000;--label2:#6C6C70;--sep:rgba(60,60,67,.18);--fill:rgba(118,118,128,.12);--fill2:rgba(118,118,128,.2);
---accent:#007AFF;--accent-tint:rgba(0,122,255,.12);--red:#FF3B30;--red-text:#D70015;--green:#248A3D;--on-accent:#FFFFFF;--focus:rgba(0,122,255,.55);
+--accent:#007AFF;--accent-text:#005FCC;--accent-solid:#005FCC;--switch:#34C759;--accent-tint:rgba(0,122,255,.12);--red:#FF3B30;--red-text:#D70015;--green:#248A3D;--on-accent:#FFFFFF;--focus:#007AFF;
 --r-card:12px;--font:-apple-system,BlinkMacSystemFont,"SF Pro Text","Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif}
 @media(prefers-color-scheme:dark){:root{
 --bg:#000000;--card:#1C1C1E;--label:#FFFFFF;--label2:#AEAEB2;--sep:rgba(84,84,88,.65);--fill:rgba(118,118,128,.24);--fill2:rgba(118,118,128,.36);
---accent:#0A84FF;--accent-tint:rgba(10,132,255,.2);--red:#FF453A;--red-text:#FF6961;--green:#30D158;--focus:rgba(10,132,255,.7)}}
+--accent:#0A84FF;--accent-text:#5AA9FF;--accent-solid:#0A6CD8;--switch:#30D158;--accent-tint:rgba(10,132,255,.2);--red:#FF453A;--red-text:#FF6961;--green:#30D158;--focus:#0A84FF}}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--label);font:17px/1.42 var(--font);letter-spacing:-.01em;-webkit-font-smoothing:antialiased;
@@ -23,8 +23,8 @@ padding:env(safe-area-inset-top) max(16px,env(safe-area-inset-right)) env(safe-a
 main,footer{max-width:640px;margin:0 auto}
 main{padding:12px 0 8px}
 :focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:8px}
-.skip{position:absolute;left:-9999px;top:0;background:var(--card);color:var(--accent);padding:10px 16px;z-index:9;border-radius:0 0 10px 0}.skip:focus{left:0}
-.back{display:inline-flex;align-items:center;gap:2px;min-height:44px;color:var(--accent);text-decoration:none;font-size:17px}
+.skip{position:absolute;left:-9999px;top:0;background:var(--card);color:var(--accent-text);padding:10px 16px;z-index:9;border-radius:0 0 10px 0}.skip:focus{left:0}
+.back{display:inline-flex;align-items:center;gap:2px;min-height:44px;color:var(--accent-text);text-decoration:none;font-size:17px}
 .back::before{content:"‹";font-size:28px;line-height:1;margin:-3px 4px 0 -2px}
 h1{font-size:34px;line-height:1.2;font-weight:700;letter-spacing:-.02em;margin:4px 0 6px}
 .lede{color:var(--label2);margin:0 0 22px;font-size:15px;line-height:1.5}
@@ -37,8 +37,8 @@ h1{font-size:34px;line-height:1.2;font-weight:700;letter-spacing:-.02em;margin:4
 .cell+.cell,.cg>*+*{box-shadow:inset 16px 1px 0 var(--card),inset 0 1px 0 var(--sep)}
 /* buttons */
 button,a.btn{font:inherit;font-size:15px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 16px;border:0;border-radius:999px;
-background:var(--fill);color:var(--accent);cursor:pointer;text-decoration:none;transition:opacity .15s,transform .15s}
-button.primary,a.btn{background:var(--accent);color:var(--on-accent)}
+background:var(--fill);color:var(--accent-text);cursor:pointer;text-decoration:none;transition:opacity .15s,transform .15s}
+button.primary,a.btn{background:var(--accent-solid);color:var(--on-accent)}
 button.danger{color:var(--red-text)}
 button:active,a.btn:active{opacity:.55}
 button:disabled{opacity:.35;cursor:not-allowed}
@@ -52,7 +52,7 @@ a.btn[hidden]{display:none}
 .drop input{position:absolute;opacity:0;width:1px;height:1px}
 .drop .ic{width:52px;height:52px;border-radius:14px;background:var(--accent);display:grid;place-items:center;margin-bottom:8px}
 .drop .ic svg{width:30px;height:30px;stroke:#fff;stroke-width:2.2;stroke-linecap:round;fill:none}
-.drop strong{font-size:17px;font-weight:600;color:var(--accent)}
+.drop strong{font-size:17px;font-weight:600;color:var(--accent-text)}
 .drop .sub{font-size:13px;color:var(--label2)}
 .drop:focus-within{outline:3px solid var(--focus);outline-offset:-3px}
 details.dis>summary{list-style:none;display:flex;align-items:center;gap:12px;min-height:48px;padding:10px 16px;cursor:pointer}
@@ -72,7 +72,7 @@ details.dis>summary .ic svg{width:18px;height:18px;stroke:#fff;stroke-width:2.4;
 #osIos:checked~.panes .p-ios,#osMac:checked~.panes .p-mac{display:block}
 ol.steps{margin:0;padding:0;list-style:none;counter-reset:s}
 ol.steps li{counter-increment:s;display:flex;gap:12px;align-items:flex-start;padding:7px 0;font-size:15px;line-height:1.45}
-ol.steps li::before{content:counter(s);flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:700;display:grid;place-items:center;margin-top:-1px}
+ol.steps li::before{content:counter(s);flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent-solid);color:#fff;font-size:13px;font-weight:700;display:grid;place-items:center;margin-top:-1px}
 .kbd{display:inline-block;padding:0 6px;border-radius:6px;background:var(--fill);font-weight:600}
 .guide .tip{font-size:13px;color:var(--label2);margin:8px 0 0}
 /* status */
@@ -93,7 +93,7 @@ canvas{display:block;width:100%;height:72px;border-radius:8px;cursor:pointer;bac
 ol.segs{list-style:none;margin:0;padding:0}
 ol.segs li{padding:12px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:10px 12px;align-items:center}
 ol.segs li+li{box-shadow:inset 52px 1px 0 var(--card),inset 0 1px 0 var(--sep)}
-ol.segs li.off .meta,ol.segs li.off .times{opacity:.4}
+ol.segs li.off .ttl{color:var(--label2)}
 .segs input[type=checkbox]{-webkit-appearance:none;appearance:none;margin:0;width:24px;height:24px;border-radius:50%;border:2px solid #C7C7CC;display:grid;place-items:center;cursor:pointer;flex:none}
 @media(prefers-color-scheme:dark){.segs input[type=checkbox]{border-color:#636366}}
 .segs input[type=checkbox]:checked{background:var(--accent);border-color:var(--accent)}
@@ -101,7 +101,8 @@ ol.segs li.off .meta,ol.segs li.off .times{opacity:.4}
 .meta{min-width:0}
 .meta .ttl{font-size:17px;font-weight:600}
 .meta .len{font-size:13px;color:var(--label2);font-variant-numeric:tabular-nums}
-.segs .play{width:44px;height:44px;padding:0;border-radius:50%;background:var(--accent);color:#fff;font-size:15px}
+.segs .play{width:44px;height:44px;padding:0;border-radius:50%;background:var(--accent-solid);color:#fff;font-size:15px}
+.segs .chkhit{display:flex;padding:10px;margin:-10px;cursor:pointer}
 li.playing .play{background:var(--red)}
 .times{grid-column:2/4;display:flex;flex-wrap:wrap;gap:8px 16px}
 .times label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--label2)}
@@ -118,19 +119,19 @@ li.playing .play{background:var(--red)}
 .slider input{flex:1;accent-color:var(--accent);min-height:32px}
 .opt{color:var(--label2);font-weight:400}
 .cell input.token{width:100%;font:inherit;font-size:16px;padding:8px 10px;border:0;border-radius:8px;background:var(--fill);color:var(--label)}
-.gf a{color:var(--accent)}
+.gf a{color:var(--accent-text)}
 input.switch{-webkit-appearance:none;appearance:none;margin:0;flex:none;width:51px;height:31px;border-radius:999px;background:var(--fill2);position:relative;cursor:pointer;transition:background .2s}
 input.switch::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.15),0 1px 1px rgba(0,0,0,.16);transition:transform .2s}
-input.switch:checked{background:#34C759}
+input.switch:checked{background:var(--switch)}
 input.switch:checked::after{transform:translateX(20px)}
 .times label.nm{flex:1 1 100%}
 .times input.name{flex:1;width:auto;min-width:0}
 .meta .ttl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.meta .len .tag{color:var(--accent)}
+.meta .len .tag{color:var(--accent-text)}
 .meta .len .bad{color:var(--red-text)}
 .segs .play svg{width:14px;height:14px;fill:currentColor}
 footer{color:var(--label2);font-size:13px;text-align:center;padding:4px 0 28px}
-footer a{color:var(--accent)}
+footer a{color:var(--accent-text)}
 .ad{border:1px dashed var(--sep);border-radius:10px;padding:10px;margin-top:14px;font-size:12px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -151,7 +152,7 @@ footer a{color:var(--accent)}
 </label>
 <details class="dis" id="vmGuide">
 <summary><span class="ic" aria-hidden="true"><svg viewBox="0 0 18 18"><path d="M3 7v4M6.5 4.5v9M10 2.5v13M13.5 5.5v7"/></svg></span>음성 메모에서 가져오기</summary>
-<div class="guide">
+<div class="guide" role="group" aria-label="기기 선택">
 <input class="osr" type="radio" name="os" id="osIos" checked><input class="osr" type="radio" name="os" id="osMac">
 <div class="segctl"><label for="osIos">iPhone · iPad</label><label for="osMac">Mac</label></div>
 <div class="panes">
@@ -175,7 +176,7 @@ footer a{color:var(--accent)}
 
 <div class="statwrap">
 <p id="status" role="status" aria-live="polite"></p>
-<progress id="prog" max="1" value="0" hidden></progress>
+<progress id="prog" max="1" value="0" hidden aria-label="진행률"></progress>
 </div>
 
 <section id="result" hidden aria-labelledby="hResult">
@@ -184,7 +185,7 @@ footer a{color:var(--accent)}
 <div class="cg">
 <p class="brag" id="brag"></p>
 <div class="tlwrap">
-<canvas id="tl" aria-label="전체 타임라인. 누르면 그 지점부터 재생" role="img"></canvas>
+<canvas id="tl" role="slider" tabindex="0" aria-label="전체 타임라인 (눌러서 그 지점부터 재생, 화살표 키로 이동)" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" aria-valuetext="0:00"></canvas>
 <div class="legend"><span>0:00</span><span>파란색 = 노래 · 눌러서 그 지점부터 재생</span><span id="tlEnd"></span></div>
 </div>
 </div>
@@ -582,14 +583,15 @@ const Media = (() => {
     if (!moov) return null;
     const dv = new DataView(moov.buffer), root = [...kids(moov, dv, 0, moov.length)][0];
     if (kid(moov, dv, root, "mvex")) return null; // fragmented MP4: not indexed here
-    let stbl = null, ts = 0;
+    let stbl = null, ts = 0, soun = 0;
     for (const trak of kids(moov, dv, root.p, root.b)) {
       if (trak.type !== "trak") continue;
       const mdia = kid(moov, dv, trak, "mdia"), hdlr = kid(moov, dv, mdia, "hdlr"), mdhd = kid(moov, dv, mdia, "mdhd");
       if (!hdlr || !mdhd || ascii(moov, hdlr.p + 8) !== "soun") continue;
+      if (++soun > 1) return null; // several sound tracks (e.g. Voice Memos "Editable" layers): decoded fallback mixes them
       ts = dv.getUint32(mdhd.p + (moov[mdhd.p] === 1 ? 20 : 12));
       stbl = kid(moov, dv, kid(moov, dv, mdia, "minf"), "stbl");
-      break;
+      // keep scanning: a second sound track must send the file to the fallback
     }
     const stsd = kid(moov, dv, stbl, "stsd"), stsz = kid(moov, dv, stbl, "stsz"), stsc = kid(moov, dv, stbl, "stsc"), stts = kid(moov, dv, stbl, "stts");
     const stco = kid(moov, dv, stbl, "stco"), co64 = kid(moov, dv, stbl, "co64");
@@ -817,12 +819,12 @@ const Media = (() => {
   // Fallback full decode only: float PCM budget (assumes stereo). Phones get far less memory per tab.
   const MOBILE = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
   const MEM_BUDGET = MOBILE ? 400e6 : 1.6e9;
-  const RATES = [44100, 32000, 22050, 16000];
+  const RATES = [44100, 32000, 22050, 16000, 11025, 8000]; // WebKit accepts ≥ 3 kHz, spec floor 8 kHz
   const store = { get: (k) => { try { return localStorage.getItem(k); } catch (_) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (_) { /* private mode */ } } };
 
   const pad = (x, w) => String(x).padStart(w, "0");
   function fmt(t) {
-    t = Math.max(0, t);
+    t = Math.max(0, Math.round(t * 10) / 10); // round first so 179.97 s reads 3:00.0, not 2:60.0
     const h = Math.floor(t / 3600), m = Math.floor(t / 60) % 60, s = t % 60;
     const ss = s.toFixed(1).padStart(4, "0");
     return h ? `${h}:${pad(m, 2)}:${ss}` : `${m}:${ss}`;
@@ -834,11 +836,29 @@ const Media = (() => {
     return (h ? `${h}시간 ` : "") + (h || m ? `${m}분 ` : "") + `${s}초`;
   }
   function parseTime(str) {
-    const p = String(str).trim().split(":").map(Number);
+    const p = String(str).trim().replace(/,/g, ".").split(":").map(Number); // comma-decimal keypads
     if (!p.length || p.length > 3 || p.some((x) => !isFinite(x) || x < 0)) return NaN;
     return p.reduce((acc, x) => acc * 60 + x, 0);
   }
-  const say = (msg) => { ui.status.textContent = msg; };
+  let lastSay = 0;
+  const say = (msg) => { ui.status.textContent = msg; lastSay = Date.now(); };
+  // Percentages go to the live region at most every 3 s so screen readers aren't flooded;
+  // the <progress> bar shows every step.
+  const sayProgress = (msg) => { if (Date.now() - lastSay > 3000) say(msg); };
+  // Keep the screen on during long work: iOS suspends page scripts once the phone auto-locks.
+  let wakeLock = null, wantWake = false;
+  async function wake(on) {
+    wantWake = on;
+    try {
+      if (on && !wakeLock && navigator.wakeLock && document.visibilityState === "visible") {
+        const lock = await navigator.wakeLock.request("screen");
+        if (!wantWake) { lock.release(); return; } // released while the request was pending
+        wakeLock = lock;
+        lock.addEventListener("release", () => { if (wakeLock === lock) wakeLock = null; });
+      } else if (!on && wakeLock) { const lock = wakeLock; wakeLock = null; await lock.release(); }
+    } catch (_) { /* unsupported or denied: work continues, just may pause when the phone locks */ }
+  }
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && wantWake) wake(true); });
   const tick = () => new Promise((r) => setTimeout(r, 0));
   function progress(v) {
     ui.prog.hidden = v == null;
@@ -858,7 +878,7 @@ const Media = (() => {
       }
       an.push(await q.shift());
       progress((k + 1) / n);
-      say(`노래 구간 찾는 중… ${Math.floor((k + 1) / n * 100)}%`);
+      sayProgress(`노래 구간 찾는 중… ${Math.floor((k + 1) / n * 100)}%`);
     }
     return an.result();
   }
@@ -893,7 +913,7 @@ const Media = (() => {
     for (let p = 0; p < buf.length; p += step) {
       an.push(A2M.decimateMono(chs, p, Math.min(buf.length, p + step), d));
       progress(p / buf.length);
-      say(`노래 구간 찾는 중… ${Math.floor(p / buf.length * 100)}%`);
+      sayProgress(`노래 구간 찾는 중… ${Math.floor(p / buf.length * 100)}%`);
       await tick();
     }
     return { src: Media.pcmSource(buf), feat: an.result() };
@@ -902,6 +922,7 @@ const Media = (() => {
   async function handleFile(file) {
     if (!file || st.busy) return;
     st.busy = true;
+    wake(true);
     stopPlay();
     clearZipLink();
     st.rec.gen++; st.rec.cache = [];
@@ -922,6 +943,7 @@ const Media = (() => {
       say(err.message || "문제가 생겼어요. 다시 시도해 주세요.");
     } finally {
       st.busy = false;
+      wake(false);
       ui.file.value = "";
     }
   }
@@ -958,7 +980,8 @@ const Media = (() => {
     const fd = new FormData(), token = ui.token.value.trim();
     if (token) fd.append("api_token", token);
     fd.append("file", new File([blob], `clip.${st.src.ext}`, { type: st.src.mime }));
-    const res = await fetch("https://api.audd.io/", { method: "POST", body: fd, signal: AbortSignal.timeout(30000) });
+    const signal = typeof AbortSignal.timeout === "function" ? AbortSignal.timeout(30000) : undefined; // Safari < 16
+    const res = await fetch("https://api.audd.io/", { method: "POST", body: fd, signal });
     const j = await res.json();
     if (j.status !== "success") { const e = new Error((j.error && j.error.error_message) || "AudD error"); e.code = j.error && j.error.error_code; throw e; }
     return j.result && j.result.title ? j.result : null;
@@ -986,20 +1009,20 @@ const Media = (() => {
     if (!st.src || !ui.autoName.checked || st.rec.blocked) return;
     const gen = ++st.rec.gen, todo = st.segs.filter((s) => s.rec !== "ok" && s.rec !== "none");
     if (!todo.length) return;
-    todo.forEach((s) => { s.rec = "pending"; });
-    renderList();
+    todo.forEach((s) => { s.rec = "pending"; refreshRow(s); });
     let next = 0;
     const worker = async () => {
       while (next < todo.length && gen === st.rec.gen && !st.rec.blocked) {
         const s = todo[next++];
         try { await recognizeOne(s, gen); }
         catch (e) {
+          if (gen !== st.rec.gen) return; // a stale request from a superseded pass must not overwrite state
           s.rec = "error";
           if (e.code === 901) st.rec.blocked = "무료 체험 한도를 다 썼어요. 설정에 AudD 토큰을 넣으면 계속 찾을 수 있어요.";
           else if (e.code === 900) st.rec.blocked = "AudD 토큰이 올바르지 않아요. 설정에서 확인해 주세요.";
         }
         if (gen !== st.rec.gen) return;
-        if (st.segs.includes(s)) renderList();
+        refreshRow(s);
       }
     };
     await Promise.all([worker(), worker()]);
@@ -1008,13 +1031,27 @@ const Media = (() => {
     const named = st.segs.filter((s) => s.rec === "ok").length, failed = st.segs.filter((s) => s.rec === "error").length;
     say(st.rec.blocked || `노래 ${st.segs.length}곡 중 ${named}곡의 이름을 찾았어요.` +
       (failed ? ` ${failed}곡은 연결 문제로 실패했어요. 설정의 '노래 이름 자동으로 찾기'를 껐다 켜면 다시 시도해요.` : ""));
-    renderList();
+    st.segs.forEach(refreshRow);
   }
 
   const canShare = (f) => { try { return !!(navigator.canShare && navigator.canShare({ files: [f] })); } catch (_) { return false; } };
   const svg = (d) => `<svg viewBox="0 0 14 14" aria-hidden="true"><path d="${d}"/></svg>`;
   const ICON_PLAY = svg("M3 1.5v11l9.5-5.5z"), ICON_STOP = svg("M2.5 2.5h9v9h-9z");
   const REC_TEXT = { pending: ["tag", "이름 찾는 중…"], none: ["", "이름을 못 찾았어요"], error: ["bad", "이름 찾기 실패"] };
+  function fillMeta(s, i, ttl, sub) {
+    ttl.textContent = s.name || `${i + 1}번 곡`;
+    sub.textContent = `${i + 1}번 · ${fmtShort(s.start)}–${fmtShort(s.end)} · ${fmtShort(s.end - s.start)}`;
+    if (REC_TEXT[s.rec]) { const t = document.createElement("span"); t.className = REC_TEXT[s.rec][0]; t.textContent = ` · ${REC_TEXT[s.rec][1]}`; sub.append(t); }
+  }
+  // Recognition results land while the user may be typing in another row: update that song's row
+  // in place instead of re-rendering (a rebuild would drop the focused input and the iOS keyboard).
+  function refreshRow(s) {
+    const i = st.segs.indexOf(s), li = ui.segs.children[i];
+    if (i < 0 || !li) return;
+    fillMeta(s, i, li.querySelector(".ttl"), li.querySelector(".len"));
+    const nameIn = li.querySelector("input.name");
+    if (nameIn && document.activeElement !== nameIn && !s.nameEdited) nameIn.value = s.name;
+  }
 
   function renderList() {
     ui.segs.textContent = "";
@@ -1025,18 +1062,18 @@ const Media = (() => {
       li.className = (s.on ? "" : "off") + (st.play && st.play.idx === i ? " playing" : "");
       const chk = document.createElement("input");
       chk.type = "checkbox"; chk.checked = s.on; chk.setAttribute("aria-label", `${i + 1}번 곡 ZIP에 포함`);
+      const chkhit = document.createElement("label"); chkhit.className = "chkhit"; chkhit.append(chk);
       chk.onchange = () => { s.on = chk.checked; li.classList.toggle("off", !s.on); clearZipLink(); ui.zip.disabled = !st.segs.some((x) => x.on); draw(); };
       const meta = document.createElement("div"); meta.className = "meta";
-      const ttl = document.createElement("div"); ttl.className = "ttl"; ttl.textContent = s.name || `${i + 1}번 곡`;
+      const ttl = document.createElement("div"); ttl.className = "ttl";
       const sub = document.createElement("div"); sub.className = "len";
-      sub.textContent = `${i + 1}번 · ${fmtShort(s.start)}–${fmtShort(s.end)} · ${fmtShort(s.end - s.start)}`;
-      if (REC_TEXT[s.rec]) { const t = document.createElement("span"); t.className = REC_TEXT[s.rec][0]; t.textContent = ` · ${REC_TEXT[s.rec][1]}`; sub.append(t); }
+      fillMeta(s, i, ttl, sub);
       meta.append(ttl, sub);
       const playing = st.play && st.play.idx === i;
       const play = document.createElement("button");
       play.type = "button"; play.className = "play"; play.innerHTML = playing ? ICON_STOP : ICON_PLAY;
       play.setAttribute("aria-label", playing ? `${i + 1}번 곡 정지` : `${i + 1}번 곡 미리듣기`);
-      play.onclick = () => playing ? stopPlay() : playFrom(s.start, s.end, i);
+      play.onclick = () => (st.play && st.play.idx === i) ? stopPlay() : playFrom(s.start, s.end, i);
 
       const times = document.createElement("div"); times.className = "times";
       const nm = document.createElement("label"); nm.className = "nm";
@@ -1053,7 +1090,7 @@ const Media = (() => {
           if (isFinite(t) && t <= dur) s[key] = t;
           if (s.end - s.start < 1) s[key] = key === "start" ? Math.max(0, s.end - 1) : Math.min(dur, s.start + 1);
           if (s.rec !== "pending") s.rec = "";
-          clearZipLink(); renderList(); draw(); recognizeAll();
+          inp.value = fmt(s[key]); refreshRow(s); clearZipLink(); draw(); recognizeAll();
         };
         l.append(label, inp);
         return l;
@@ -1063,12 +1100,12 @@ const Media = (() => {
       const acts = document.createElement("div"); acts.className = "acts";
       const btn = (txt, aria, fn, cls) => { const b = document.createElement("button"); b.type = "button"; b.textContent = txt; b.setAttribute("aria-label", aria); if (cls) b.className = cls; b.onclick = fn; return b; };
       acts.append(
-        btn("끝 10초", `${i + 1}번 곡 마지막 10초 듣기`, () => playFrom(Math.max(s.start, s.end - 10), s.end, i)),
+        btn("끝 10초", `${i + 1}번 곡 끝 10초 듣기`, () => playFrom(Math.max(s.start, s.end - 10), s.end, i)),
         btn("저장", `${i + 1}번 곡 저장`, () => saveOne(i)),
       );
       if (shareable) acts.append(btn("공유", `${i + 1}번 곡 공유 (파일에 저장·메신저)`, () => shareOne(i)));
       acts.append(btn("삭제", `${i + 1}번 구간 삭제`, () => { if (st.play && st.play.idx === i) stopPlay(); st.segs.splice(i, 1); clearZipLink(); renderList(); draw(); }, "danger"));
-      li.append(chk, meta, play, times, acts);
+      li.append(chkhit, meta, play, times, acts);
       ui.segs.append(li);
     });
     ui.zip.disabled = !st.segs.some((s) => s.on);
@@ -1099,11 +1136,32 @@ const Media = (() => {
     });
     g.setLineDash([]);
     g.fillStyle = cssVar("--red", "#FF3B30"); g.fillRect(curTime() / dur * w - 1, 0, 2, h);
+    syncSlider();
+  }
+  // Keep the timeline's slider semantics in sync with what is painted.
+  function syncSlider() {
+    if (!st.src) return;
+    const t = curTime();
+    ui.tl.setAttribute("aria-valuemax", String(Math.round(st.src.duration)));
+    ui.tl.setAttribute("aria-valuenow", String(Math.round(t)));
+    ui.tl.setAttribute("aria-valuetext", fmtShort(t));
   }
 
   // Playback through <audio> (not Web Audio): plays with the iPhone silent switch on, and the clip
   // is built synchronously so play() stays inside the tap gesture.
   function curTime() { return st.play ? Math.min(st.play.end, st.play.base + player.currentTime) : st.cursor; }
+  // Update only the playing row's state instead of rebuilding the whole list
+  // (a rebuild would drop focus and scroll position mid-playback).
+  function markPlaying() {
+    [...ui.segs.children].forEach((li, i) => {
+      const playing = st.play && st.play.idx === i;
+      li.classList.toggle("playing", !!playing);
+      const play = li.querySelector("button.play");
+      if (!play) return;
+      play.innerHTML = playing ? ICON_STOP : ICON_PLAY;
+      play.setAttribute("aria-label", playing ? `${i + 1}번 곡 정지` : `${i + 1}번 곡 미리듣기`);
+    });
+  }
   function playFrom(t0, t1, idx) {
     stopPlay();
     const c = st.src.cut(t0, t1), url = URL.createObjectURL(c.blob);
@@ -1111,7 +1169,7 @@ const Media = (() => {
     player.src = url;
     player.onended = () => { if (st.play && st.play.url === url) stopPlay(); };
     player.play().catch(() => { if (st.play && st.play.url === url) { stopPlay(); say("재생이 막혔어요. 한 번 더 눌러 주세요."); } });
-    if (idx != null) renderList();
+    if (idx != null) markPlaying();
     const loop = () => { if (!st.play || st.play.url !== url) return; draw(); requestAnimationFrame(loop); };
     requestAnimationFrame(loop);
   }
@@ -1119,7 +1177,7 @@ const Media = (() => {
     const was = st.play;
     if (was) { st.cursor = curTime(); player.pause(); player.removeAttribute("src"); player.load(); URL.revokeObjectURL(was.url); }
     st.play = null;
-    if (was && was.idx != null) renderList();
+    if (was && was.idx != null) markPlaying();
     draw();
   }
 
@@ -1142,7 +1200,9 @@ const Media = (() => {
     navigator.share({ files: [f], title: s.name || f.name }).catch((e) => { if (e && e.name !== "AbortError") download(f, f.name); });
   }
 
+  let zipGen = 0;
   function clearZipLink() {
+    zipGen++; // also invalidates a ZIP still being built
     if (st.zipUrl) URL.revokeObjectURL(st.zipUrl);
     st.zipUrl = ""; ui.zipLink.hidden = true; ui.zipLink.removeAttribute("href");
   }
@@ -1153,9 +1213,12 @@ const Media = (() => {
     if (!idx.length) return;
     clearZipLink();
     ui.zip.disabled = true;
+    wake(true);
     try {
       const files = idx.map((i) => ({ name: fileName(i), blob: st.src.cut(st.segs[i].start, st.segs[i].end).blob }));
-      const blob = await Media.zip(files, (k) => { say(`ZIP 만드는 중… ${k + 1}/${idx.length}`); progress(k / idx.length); });
+      const g = zipGen;
+      const blob = await Media.zip(files, (k) => { sayProgress(`ZIP 만드는 중… ${k + 1}/${idx.length}`); progress(k / idx.length); });
+      if (g !== zipGen) { say("곡 목록이 바뀌어서 ZIP을 다시 만들어야 해요."); return; }
       const name = `${st.name}_노래${idx.length}곡.zip`;
       st.zipUrl = URL.createObjectURL(blob);
       ui.zipLink.href = st.zipUrl; ui.zipLink.download = name;
@@ -1164,7 +1227,7 @@ const Media = (() => {
       say(MOBILE ? `ZIP이 준비됐어요(${idx.length}곡). 'ZIP 받기'를 눌러 저장하세요.` : `ZIP을 저장했어요(${idx.length}곡).`);
     } catch (_) {
       say("ZIP을 만들지 못했어요. 곡을 하나씩 저장해 주세요.");
-    } finally { progress(null); ui.zip.disabled = false; }
+    } finally { progress(null); ui.zip.disabled = false; wake(false); }
   }
 
   // Settings persistence (this device only).
@@ -1204,12 +1267,32 @@ const Media = (() => {
     say(`${fmt(start)}부터 3분짜리 구간을 추가했어요. 시작·끝을 고쳐 주세요.`);
     recognizeAll();
   });
+  function playFromCursor() {
+    if (!st.src) return;
+    const dur = st.src.duration;
+    // The decoded fallback renders WAV on the fly, so keep that clip short.
+    playFrom(st.cursor, Math.min(dur, st.cursor + (st.src.kind === "pcm" ? 120 : 600)), null);
+  }
   ui.tl.addEventListener("click", (e) => {
     if (!st.src) return;
     const dur = st.src.duration, r = ui.tl.getBoundingClientRect();
     st.cursor = Math.max(0, Math.min(dur, (e.clientX - r.left) / r.width * dur));
-    // The decoded fallback renders WAV on the fly, so keep that clip short.
-    playFrom(st.cursor, Math.min(dur, st.cursor + (st.src.kind === "pcm" ? 120 : 600)), null);
+    playFromCursor();
+  });
+  ui.tl.addEventListener("keydown", (e) => {
+    if (!st.src) return;
+    const dur = st.src.duration;
+    const step = { ArrowLeft: -5, ArrowDown: -5, ArrowRight: 5, ArrowUp: 5, PageDown: -30, PageUp: 30, Home: 0, End: dur }[e.key];
+    if (step !== undefined) {
+      e.preventDefault();
+      stopPlay();
+      st.cursor = e.key === "Home" ? 0 : e.key === "End" ? dur : Math.max(0, Math.min(dur, st.cursor + step));
+      draw();
+    } else if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      stopPlay();
+      playFromCursor();
+    }
   });
   window.addEventListener("resize", draw);
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", draw);
