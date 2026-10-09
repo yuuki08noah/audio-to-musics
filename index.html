@@ -43,81 +43,15 @@ button.danger{color:var(--red-text)}
 button:active,a.btn:active{opacity:.55}
 button:disabled{opacity:.35;cursor:not-allowed}
 a.btn[hidden]{display:none}
-.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 0}
-.toolbar .primary,.toolbar a.btn{flex:1 1 100%}
-.toolbar button:not(.primary){flex:1 1 0}
-/* import */
-.banner{background:var(--accent-tint);border-radius:var(--r-card);padding:12px 16px;margin:0 0 20px;font-size:15px;line-height:1.5}
-.banner strong{display:block;font-size:17px;margin-bottom:2px}
-.banner[hidden]{display:none}
-.mh{font-size:15px;font-weight:600;margin:14px 0 6px}
-.mh:first-child{margin-top:4px}
-a.btn.sc{width:100%;margin:2px 0 6px}
-code.path{display:block;margin-top:6px;padding:8px 10px;border-radius:8px;background:var(--fill);font:13px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;-webkit-user-select:all;user-select:all}
-.copypath{min-height:32px;font-size:13px;padding:0 12px;margin-left:4px}
-.drop{display:flex;flex-direction:column;align-items:center;gap:4px;padding:26px 16px 22px;cursor:pointer;text-align:center;transition:background .15s}
-.drop.over{background:var(--accent-tint)}
-.drop input{position:absolute;opacity:0;width:1px;height:1px}
-.drop .ic{width:52px;height:52px;border-radius:14px;background:var(--accent);display:grid;place-items:center;margin-bottom:8px}
-.drop .ic svg{width:30px;height:30px;stroke:#fff;stroke-width:2.2;stroke-linecap:round;fill:none}
-.drop strong{font-size:17px;font-weight:600;color:var(--accent-text)}
-.drop .sub{font-size:13px;color:var(--label2)}
-.drop:focus-within{outline:3px solid var(--focus);outline-offset:-3px}
-details.dis>summary{list-style:none;display:flex;align-items:center;gap:12px;min-height:48px;padding:10px 16px;cursor:pointer}
-details.dis>summary::-webkit-details-marker{display:none}
-details.dis>summary::after{content:"";margin-left:auto;width:8px;height:8px;border:solid var(--label2);border-width:0 2px 2px 0;transform:rotate(-45deg);transition:transform .2s;opacity:.7}
-details.dis[open]>summary::after{transform:rotate(45deg)}
-details.dis>summary .ic{width:30px;height:30px;border-radius:7px;background:#FF3B30;display:grid;place-items:center;flex:none}
-details.dis>summary .ic svg{width:18px;height:18px;stroke:#fff;stroke-width:2.4;stroke-linecap:round;fill:none}
-.guide{padding:2px 16px 16px}
-.segctl{display:flex;background:var(--fill);border-radius:9px;padding:2px;margin:4px 0 14px}
-.osr{position:absolute;opacity:0;pointer-events:none}
-.segctl label{flex:1;text-align:center;font-size:13px;font-weight:600;padding:7px 0;border-radius:7px;cursor:pointer;color:var(--label)}
-#osIos:checked~.segctl [for=osIos],#osMac:checked~.segctl [for=osMac]{background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.12),0 0 0 .5px rgba(0,0,0,.04)}
-@media(prefers-color-scheme:dark){#osIos:checked~.segctl [for=osIos],#osMac:checked~.segctl [for=osMac]{background:#636366}}
-#osIos:focus-visible~.segctl [for=osIos],#osMac:focus-visible~.segctl [for=osMac]{outline:3px solid var(--focus)}
-.pane{display:none}
-#osIos:checked~.panes .p-ios,#osMac:checked~.panes .p-mac{display:block}
 ol.steps{margin:0;padding:0;list-style:none;counter-reset:s}
 ol.steps li{counter-increment:s;display:flex;gap:12px;align-items:flex-start;padding:7px 0;font-size:15px;line-height:1.45}
 ol.steps li::before{content:counter(s);flex:none;width:24px;height:24px;border-radius:50%;background:var(--accent-solid);color:#fff;font-size:13px;font-weight:700;display:grid;place-items:center;margin-top:-1px}
 .kbd{display:inline-block;padding:0 6px;border-radius:6px;background:var(--fill);font-weight:600}
 .guide .tip{font-size:13px;color:var(--label2);margin:8px 0 0}
-/* status */
-#status{min-height:1.4em;margin:0 16px;font-size:15px;color:var(--label2)}
-#status:empty{display:none}
 progress{display:block;width:calc(100% - 32px);margin:10px 16px 0;height:4px;border:0;border-radius:2px;background:var(--fill2);-webkit-appearance:none;appearance:none;accent-color:var(--accent)}
 progress::-webkit-progress-bar{background:var(--fill2);border-radius:2px}
 progress::-webkit-progress-value{background:var(--accent);border-radius:2px}
 progress::-moz-progress-bar{background:var(--accent);border-radius:2px}
-#result[hidden],progress[hidden]{display:none}
-.statwrap{margin:-14px 0 28px}
-/* summary + timeline */
-.brag{margin:0;padding:14px 16px 4px;font-size:15px;color:var(--label2)}
-.tlwrap{padding:8px 16px 14px}
-canvas{display:block;width:100%;height:72px;border-radius:8px;cursor:pointer;background:var(--fill)}
-.legend{display:flex;justify-content:space-between;color:var(--label2);font-size:12px;margin-top:6px;font-variant-numeric:tabular-nums}
-/* song list */
-ol.segs{list-style:none;margin:0;padding:0}
-ol.segs li{padding:12px 16px;display:grid;grid-template-columns:auto 1fr auto;gap:10px 12px;align-items:center}
-ol.segs li+li{box-shadow:inset 52px 1px 0 var(--card),inset 0 1px 0 var(--sep)}
-ol.segs li.off .ttl{color:var(--label2)}
-.segs input[type=checkbox]{-webkit-appearance:none;appearance:none;margin:0;width:24px;height:24px;border-radius:50%;border:2px solid #C7C7CC;display:grid;place-items:center;cursor:pointer;flex:none}
-@media(prefers-color-scheme:dark){.segs input[type=checkbox]{border-color:#636366}}
-.segs input[type=checkbox]:checked{background:var(--accent);border-color:var(--accent)}
-.segs input[type=checkbox]:checked::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:translateY(-1px) rotate(45deg)}
-.meta{min-width:0}
-.meta .ttl{font-size:17px;font-weight:600}
-.meta .len{font-size:13px;color:var(--label2);font-variant-numeric:tabular-nums}
-.segs .play{width:44px;height:44px;padding:0;border-radius:50%;background:var(--accent-solid);color:#fff;font-size:15px}
-.segs .chkhit{display:flex;padding:10px;margin:-10px;cursor:pointer}
-li.playing .play{background:var(--red)}
-.times{grid-column:2/4;display:flex;flex-wrap:wrap;gap:8px 16px}
-.times label{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--label2)}
-.times input{width:6.4em;font:inherit;font-size:16px;font-variant-numeric:tabular-nums;padding:6px 10px;border:0;border-radius:8px;background:var(--fill);color:var(--label)}
-.acts{grid-column:2/4;display:flex;flex-wrap:wrap;gap:6px}
-.acts button{font-size:14px;min-height:36px;padding:0 13px}
-@media(pointer:coarse){.acts button{min-height:44px}}
 /* settings */
 .cell label{flex:1}
 .cell .val{display:flex;align-items:center;gap:6px;color:var(--label2);font-size:15px}
@@ -132,117 +66,220 @@ input.switch{-webkit-appearance:none;appearance:none;margin:0;flex:none;width:51
 input.switch::after{content:"";position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.15),0 1px 1px rgba(0,0,0,.16);transition:transform .2s}
 input.switch:checked{background:var(--switch)}
 input.switch:checked::after{transform:translateX(20px)}
-.times label.nm{flex:1 1 100%}
-.times input.name{flex:1;width:auto;min-width:0}
-.meta .ttl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.meta .len .tag{color:var(--accent-text)}
-.meta .len .bad{color:var(--red-text)}
-.segs .play svg{width:14px;height:14px;fill:currentColor}
 footer{color:var(--label2);font-size:13px;text-align:center;padding:4px 0 28px}
 footer a{color:var(--accent-text)}
 .ad{border:1px dashed var(--sep);border-radius:10px;padding:10px;margin-top:14px;font-size:12px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+.vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+[hidden]{display:none!important}
+.sub{color:var(--label2);font-size:15px;margin:0}
+.pad{padding:12px 16px}
+.pad>p{margin:0 0 8px;font-size:15px;line-height:1.5}
+/* start */
+.drop{display:flex;flex-direction:column;align-items:center;gap:4px;padding:28px 16px 24px;margin:0 0 28px;cursor:pointer;text-align:center;background:var(--card);border-radius:var(--r-card);transition:background .15s}
+.drop.over,body.dragging .drop{background:var(--accent-tint);outline:2px dashed var(--accent);outline-offset:-6px}
+.drop input{position:absolute;opacity:0;width:1px;height:1px}
+.drop .ic{width:56px;height:56px;border-radius:16px;background:var(--accent-solid);display:grid;place-items:center;margin-bottom:10px}
+.drop .ic svg{width:30px;height:30px;stroke:#fff;stroke-width:2.2;stroke-linecap:round;fill:none}
+.drop strong{font-size:20px;font-weight:700;color:var(--accent-text)}
+.drop:focus-within{outline:3px solid var(--focus);outline-offset:2px}
+.banner{background:var(--accent-tint);border-radius:var(--r-card);padding:14px 16px;margin:0 0 16px;font-size:15px;line-height:1.5}
+.banner strong{display:block;font-size:17px;margin-bottom:2px}
+.banner button{width:100%;margin-top:10px}
+a.btn.sm,button.sm{min-height:36px;font-size:14px;padding:0 14px}
+details.more{margin-top:6px}
+details.more>summary{list-style:none;cursor:pointer;color:var(--accent-text);font-size:15px;font-weight:600;min-height:44px;display:flex;align-items:center;gap:6px}
+details.more>summary::-webkit-details-marker{display:none}
+details.more>summary::after{content:"";width:7px;height:7px;border:solid currentColor;border-width:0 2px 2px 0;transform:rotate(45deg) translateY(-2px);transition:transform .2s}
+details.more[open]>summary::after{transform:rotate(225deg) translateY(-1px)}
+.privacy{font-size:13px;color:var(--label2);text-align:center;margin:8px 16px 0;line-height:1.5}
+code.path{display:block;margin:6px 0;padding:8px 10px;border-radius:8px;background:var(--fill);font:13px/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;word-break:break-all;-webkit-user-select:all;user-select:all}
+/* work */
+.workcard{background:var(--card);border-radius:var(--r-card);padding:28px 20px 22px;text-align:center;margin-top:24px}
+.workcard h2{font-size:22px;margin:14px 0 4px}
+.workcard progress{display:block;width:100%;height:6px;margin:18px 0 8px;border:0;border-radius:3px;background:var(--fill2);-webkit-appearance:none;appearance:none;accent-color:var(--accent)}
+.workcard progress::-webkit-progress-bar{background:var(--fill2);border-radius:3px}
+.workcard progress::-webkit-progress-value{background:var(--accent);border-radius:3px;transition:width .3s}
+.workcard progress::-moz-progress-bar{background:var(--accent);border-radius:3px}
+.workmeta{display:flex;justify-content:space-between;font-size:13px;color:var(--label2);font-variant-numeric:tabular-nums;margin:0 0 18px}
+.errmsg{font-size:17px;margin:16px 0 14px;line-height:1.5}
+#workError button{width:100%;margin-bottom:8px}
+.workcard .tip{font-size:13px;color:var(--label2);margin:14px 0 0}
+.spin{width:36px;height:36px;margin:0 auto;border-radius:50%;border:3.5px solid var(--fill2);border-top-color:var(--accent);animation:spin .9s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.name-ell{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* result */
+.reshead{display:flex;align-items:flex-start;gap:12px;margin:6px 0 14px}
+.reshead>div{flex:1;min-width:0}
+.reshead h2{font-size:28px;line-height:1.2;font-weight:700;margin:0 0 2px;letter-spacing:-.02em}
+.toolbar{display:flex;flex-direction:column;gap:8px;margin:0 0 6px}
+.toolbar>*{width:100%;min-height:50px;font-size:17px}
+#saveHint{margin:4px 16px 0}
+.card{background:var(--card);border-radius:var(--r-card);padding:14px 16px;margin:16px 0 0;font-size:15px;line-height:1.5}
+.card strong{display:block;font-size:17px;margin-bottom:2px}
+.card p{margin:0 0 10px}
+.card a{color:var(--accent-text)}
+.card .row{display:flex;gap:8px}
+.card input{flex:1;min-width:0;font:inherit;font-size:16px;padding:8px 12px;border:0;border-radius:10px;background:var(--fill);color:var(--label)}
+.tlwrap{padding:12px 16px 12px;background:var(--card);border-radius:var(--r-card);margin:20px 0 0}
+canvas{display:block;width:100%;height:64px;border-radius:8px;cursor:pointer;background:var(--fill)}
+.legend{display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--label2);font-size:12px;margin-top:6px;font-variant-numeric:tabular-nums;min-height:32px}
+.legend button{min-height:32px;font-size:13px;padding:0 12px}
+.listhead{display:flex;align-items:flex-end;justify-content:space-between;margin:24px 0 7px}
+.listhead .gh{margin-bottom:0}
+ol.segs{list-style:none;margin:0;padding:0}
+ol.segs>li{display:grid;grid-template-columns:1fr auto;align-items:center;gap:0 8px;padding:0 12px 0 0}
+ol.segs>li+li{box-shadow:inset 60px 1px 0 var(--card),inset 0 1px 0 var(--sep)}
+button.row{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:12px;min-height:64px;padding:10px 0 10px 16px;cursor:pointer;min-width:0;border-radius:var(--r-card)}
+button.row:focus-visible{outline:3px solid var(--focus);outline-offset:-3px}
+.idx{flex:none;width:30px;height:30px;border-radius:50%;background:var(--fill);color:var(--label2);font-size:13px;font-weight:700;display:grid;place-items:center;font-variant-numeric:tabular-nums}
+.meta{min-width:0;flex:1}
+.ttl{display:block;font-size:17px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.len{display:block;font-size:13px;color:var(--label2);font-variant-numeric:tabular-nums}
+.len .tag{color:var(--accent-text)}
+.len .bad{color:var(--red-text)}
+.chev{flex:none;width:8px;height:8px;border:solid var(--label2);border-width:0 2px 2px 0;transform:rotate(45deg);transition:transform .2s;opacity:.6;margin-right:4px}
+button.row[aria-expanded=true] .chev{transform:rotate(225deg)}
+.segs .play{width:44px;height:44px;padding:0;border-radius:50%;background:var(--accent-solid);color:#fff}
+.segs .play svg{width:14px;height:14px;fill:currentColor}
+li.playing .play{background:var(--red)}
+li.playing .idx{background:var(--accent-solid);color:#fff}
+.edit{grid-column:1/-1;padding:4px 4px 16px 16px;display:flex;flex-direction:column;gap:12px}
+@media(min-width:520px){.edit{padding-left:58px}}
+[tabindex="-1"]:focus{outline:none}
+.edit label.f{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--label2)}
+.edit input{font:inherit;font-size:16px;padding:8px 12px;border:0;border-radius:10px;background:var(--fill);color:var(--label);min-width:0}
+.trow{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.trow .tl{width:2.2em;font-size:13px;color:var(--label2)}
+.trow .tv{min-width:4.6em;text-align:center;font-variant-numeric:tabular-nums;font-weight:600}
+.trow input{width:6.2em;text-align:center;font-variant-numeric:tabular-nums;padding:8px 6px}
+.trow button{min-height:40px;padding:0 10px;font-size:14px}
+.tgroup{display:flex;flex-direction:column;gap:6px}
+.edit .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.edit .acts button{min-height:40px;font-size:14px}
+button.danger{color:var(--red-text)}
+.addrow{margin:10px 0 0;width:100%}
+/* tune */
+details.tune{margin:28px 0 0}
+details.tune>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;min-height:44px;padding:0 16px;font-size:15px;color:var(--accent-text);font-weight:600}
+details.tune>summary::-webkit-details-marker{display:none}
+details.tune>summary::after{content:"";width:7px;height:7px;border:solid currentColor;border-width:0 2px 2px 0;transform:rotate(45deg);transition:transform .2s}
+details.tune[open]>summary::after{transform:rotate(225deg)}
+details.tune .cg{margin-top:6px}
+.slider .lbl{white-space:nowrap}
+/* toast */
+#toast{position:fixed;left:0;right:0;margin:0 auto;width:max-content;bottom:calc(16px + env(safe-area-inset-bottom));z-index:20;display:flex;align-items:center;gap:12px;max-width:min(560px,calc(100% - 32px));padding:10px 10px 10px 18px;border-radius:14px;background:rgba(30,30,32,.94);color:#fff;font-size:15px;box-shadow:0 8px 30px rgba(0,0,0,.25);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px)}
+#toast span{flex:1}
+#toast button{background:rgba(255,255,255,.16);color:#fff;min-height:36px;font-size:14px}
+@media(prefers-color-scheme:dark){#toast{background:rgba(58,58,60,.94)}}
+.view{animation:fadein .25s ease-out}
+@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body><a class="skip" href="#maincontent">본문 바로가기</a>
 <main id="maincontent">
-<h1>노래만 잘라주는 가위</h1>
-<p class="lede">대사와 노래가 번갈아 나오는 긴 녹음에서 노래만 찾아 곡별로 잘라 드리고, 노래 이름도 찾아 붙여 드려요. 녹음 파일은 이 기기 밖으로 나가지 않아요. 노래 이름을 찾을 때만 곡마다 15초 조각을 음악 인식 서비스(AudD)로 보내요.</p>
 
-<div class="banner" id="fromShortcut" role="note" hidden>
-<strong>단축어로 녹음을 보냈어요</strong>
-아래 <b>파일 선택</b>을 누르고 <b>최근 항목</b> 맨 위에 있는 <b id="scName">녹음</b> 파일을 고르세요. 안 보이면 iCloud Drive › Shortcuts › 노래가위 폴더에 있어요.
+<section id="viewStart" class="view" aria-labelledby="hStart">
+<h1 id="hStart" tabindex="-1">노래만 잘라주는 가위</h1>
+<p class="lede">긴 녹음에서 노래만 찾아 곡별로 잘라 드려요. 노래 이름도 붙여 드려요.</p>
+<div class="banner" id="fromShortcut" hidden>
+<strong>녹음을 받을 준비가 됐어요</strong>
+<span>방금 보낸 <b id="scName">녹음</b> 파일이 최근 항목 맨 위에 있어요.</span>
+<button type="button" class="primary" id="pickSent">보낸 녹음 고르기</button>
 </div>
-<section class="group" aria-labelledby="hImport">
-<h2 class="gh" id="hImport">녹음 가져오기</h2>
-<div class="cg">
 <label class="drop" id="drop">
 <input type="file" id="file" accept="audio/*,.m4a,.qta,.mp3,.aac,.wav,.flac,.ogg,.opus">
 <span class="ic" aria-hidden="true"><svg viewBox="0 0 30 30"><path d="M5 12v6M10 8v14M15 4v22M20 9v12M25 13v4"/></svg></span>
-<strong>파일 선택</strong>
-<span class="sub">음성 메모 · m4a · mp3 · wav 등 · 끌어다 놓거나 붙여넣어도 돼요</span>
+<strong>녹음 선택</strong>
+<span class="sub" id="dropSub">음성 메모 · m4a · mp3 · wav</span>
 </label>
-<details class="dis" id="vmGuide">
-<summary><span class="ic" aria-hidden="true"><svg viewBox="0 0 18 18"><path d="M3 7v4M6.5 4.5v9M10 2.5v13M13.5 5.5v7"/></svg></span>음성 메모에서 가져오기</summary>
-<div class="guide" role="group" aria-label="기기 선택">
-<input class="osr" type="radio" name="os" id="osIos" checked><input class="osr" type="radio" name="os" id="osMac">
-<div class="segctl"><label for="osIos">iPhone · iPad</label><label for="osMac">Mac</label></div>
-<div class="panes">
-<div class="pane p-ios">
-<h3 class="mh">추천 · 단축어로 보내기 <span class="opt">(처음 한 번만 설정)</span></h3>
-<a class="btn sc" href="https://yuuki08noah.github.io/audio-to-musics/shortcut/%EB%85%B8%EB%9E%98%20%EA%B0%80%EC%9C%84%EB%A1%9C%20%EB%B3%B4%EB%82%B4%EA%B8%B0.shortcut" download="노래 가위로 보내기.shortcut">‘노래 가위로 보내기’ 단축어 받기</a>
+
+<section class="group" id="iosCard" hidden aria-labelledby="hIos">
+<h2 class="gh" id="hIos">음성 메모에서 바로 보내기</h2>
+<div class="cg pad">
 <ol class="steps">
-<li><span>위 버튼으로 단축어를 받아 <b>단축어에 추가</b>하세요. 다운로드로 받아지면 파일 앱 › 다운로드에서 한 번 탭하면 추가돼요.</span></li>
-<li><span><b>음성 메모</b>에서 녹음을 탭 → <span class="kbd">⋯</span> → <b>공유</b> → <b>노래 가위로 보내기</b>.</span></li>
-<li><span>이 페이지가 자동으로 열려요. <b>파일 선택</b> → <b>최근 항목</b> 맨 위의 녹음을 고르세요.</span></li>
+<li><span><b>음성 메모</b>에서 녹음 → <span class="kbd">⋯</span> → <b>공유</b> → <b>파일에 저장</b></span></li>
+<li><span>위 <b>녹음 선택</b> → <b>최근 항목</b> 맨 위의 녹음</span></li>
 </ol>
-<h3 class="mh">단축어 없이</h3>
+<details class="more" id="scMore"><summary>자주 쓴다면 · 단축어로 더 빠르게</summary>
+<p>처음 한 번만 추가해 두면, 공유 메뉴에서 바로 이 페이지로 보낼 수 있어요.</p>
+<a class="btn sm" id="scLink" href="https://yuuki08noah.github.io/audio-to-musics/shortcut/%EB%85%B8%EB%9E%98%20%EA%B0%80%EC%9C%84%EB%A1%9C%20%EB%B3%B4%EB%82%B4%EA%B8%B0.shortcut" download="노래 가위로 보내기.shortcut">단축어 추가</a>
 <ol class="steps">
-<li><span><b>음성 메모</b>에서 녹음을 탭 → <span class="kbd">⋯</span> → <b>공유</b> → <b>파일에 저장</b>.</span></li>
-<li><span>여기서 <b>파일 선택</b> → <b>최근 항목</b> 맨 위의 녹음을 고르세요.</span></li>
+<li><span><b>음성 메모</b>에서 녹음 → <span class="kbd">⋯</span> → <b>공유</b> → <b>노래 가위로 보내기</b></span></li>
+<li><span>이 페이지가 열리면 <b>보낸 녹음 고르기</b></span></li>
 </ol>
-<p class="tip">iPad에서는 파일 앱의 녹음을 위 상자로 바로 끌어다 놓아도 돼요. iPhone의 음성 메모는 웹페이지에 녹음을 직접 넘겨줄 수 없어서(복사·붙여넣기, 끌어다 놓기 불가) 파일로 한 번 저장하는 단계가 꼭 필요해요. 단축어는 그 저장을 자동으로 하고 이 페이지를 열어 줘요. 녹음은 iCloud Drive › Shortcuts › 노래가위에 저장돼요.</p>
-</div>
-<div class="pane p-mac">
-<h3 class="mh">가장 빠른 방법</h3>
-<ol class="steps">
-<li><span><b>음성 메모</b> 앱에서 녹음을 위 상자로 <b>바로 끌어다 놓으세요</b>(Safari). 안 되는 브라우저면 Finder로 끌어낸 뒤 그 파일을 끌어다 놓으세요.</span></li>
-</ol>
-<h3 class="mh">파일 선택 창에서 음성 메모 폴더 바로 열기</h3>
-<ol class="steps">
-<li><span>위 <b>파일 선택</b>을 누르고 창이 뜨면 <span class="kbd">⌘</span><span class="kbd">⇧</span><span class="kbd">G</span>를 누르세요.</span></li>
-<li><span>아래 경로를 붙여넣고 <span class="kbd">↩</span>: <button type="button" class="copypath" id="copyVmPath">경로 복사</button><code class="path" id="vmPath">~/Library/Group Containers/group.com.apple.VoiceMemos.shared/Recordings</code></span></li>
-<li><span>파일 이름은 녹음한 <b>날짜·시각</b>이에요(예: 20261009 143012-….m4a). 녹음 시각으로 고르세요.</span></li>
-</ol>
-<p class="tip">Finder에서 <span class="kbd">⌘</span><span class="kbd">C</span>로 복사한 녹음은 이 페이지에서 <span class="kbd">⌘</span><span class="kbd">V</span>로 붙여넣어도 돼요.</p>
-</div>
-</div>
-</div>
 </details>
 </div>
 </section>
 
-<div class="statwrap">
-<p id="status" role="status" aria-live="polite"></p>
-<progress id="prog" max="1" value="0" hidden aria-label="진행률"></progress>
+<section class="group" id="macCard" hidden aria-labelledby="hMac">
+<h2 class="gh" id="hMac">음성 메모에서 가져오기</h2>
+<div class="cg pad">
+<p><b>음성 메모</b> 앱에서 녹음을 이 창으로 <b>끌어다 놓으세요</b>.</p>
+<details class="more"><summary>파일 선택 창에서 찾기</summary>
+<ol class="steps">
+<li><span><b>녹음 선택</b>을 누르고 <span class="kbd">⌘</span><span class="kbd">⇧</span><span class="kbd">G</span></span></li>
+<li><span>이 경로를 붙여넣고 <span class="kbd">↩</span> <button type="button" class="sm" id="copyVmPath">경로 복사</button><code class="path" id="vmPath">~/Library/Group Containers/group.com.apple.VoiceMemos.shared/Recordings</code></span></li>
+<li><span>파일 이름이 녹음한 날짜·시각이에요. 시각으로 고르세요.</span></li>
+</ol>
+</details>
 </div>
+</section>
+<p class="privacy">녹음은 이 기기에서만 처리돼요. 노래 이름을 찾을 때만 곡마다 15초를 음악 인식 서비스(AudD)로 보내요.</p>
+</section>
 
-<section id="result" hidden aria-labelledby="hResult">
-<div class="group">
-<h2 class="gh" id="hResult">찾은 노래</h2>
-<div class="cg">
-<p class="brag" id="brag"></p>
-<div class="tlwrap">
-<canvas id="tl" role="slider" tabindex="0" aria-label="전체 타임라인 (눌러서 그 지점부터 재생, 화살표 키로 이동)" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" aria-valuetext="0:00"></canvas>
-<div class="legend"><span>0:00</span><span>파란색 = 노래 · 눌러서 그 지점부터 재생</span><span id="tlEnd"></span></div>
-</div>
-</div>
-<div class="toolbar">
-<button id="zipBtn" type="button" class="primary">선택한 곡 모두 저장 (ZIP)</button>
-<a id="zipLink" class="btn" hidden></a>
-<button id="stopBtn" type="button">정지</button>
-<button id="addBtn" type="button">구간 추가</button>
-</div>
-</div>
-<div class="group">
-<h2 class="gh">곡 목록</h2>
-<ol class="segs cg" id="segs"></ol>
-<p class="gf"><span id="fmtNote"></span> 시작·끝 시간은 직접 고칠 수 있어요(예: 3:21.5). 설정을 바꾸면 다시 찾으면서 고친 구간은 초기화돼요.</p>
+<section id="viewWork" class="view" hidden aria-labelledby="hWork">
+<div class="workcard">
+<div class="spin" aria-hidden="true"></div>
+<h2 id="hWork" tabindex="-1">노래 찾는 중</h2>
+<p class="sub name-ell" id="workName"></p>
+<progress id="prog" max="1" value="0" aria-label="진행률"></progress>
+<p class="workmeta"><span id="workPct">0%</span><span id="workEta"></span></p>
+<div id="workError" hidden><p class="errmsg" id="workErrMsg"></p><button type="button" class="primary" id="retryBtn">다른 녹음 고르기</button></div>
+<button type="button" id="cancelBtn">취소</button>
+<p class="tip" id="workTip">끝날 때까지 이 화면을 켜 두세요.</p>
 </div>
 </section>
 
-<section class="group" aria-labelledby="hSet">
-<h2 class="gh" id="hSet">설정</h2>
+<section id="viewResult" class="view" hidden aria-labelledby="resTitle">
+<div class="reshead">
+<div><h2 id="resTitle" tabindex="-1">노래</h2><p class="sub" id="resSub"></p></div>
+<button type="button" id="againBtn" class="sm">다른 녹음</button>
+</div>
+<div class="toolbar">
+<button type="button" id="saveAllBtn" class="primary">모두 저장</button>
+<a id="zipLink" class="btn" hidden></a>
+</div>
+<p class="gf" id="saveHint" hidden></p>
+<div class="card" id="nameCard" hidden>
+<strong id="nameCardTitle">노래 이름 찾기 무료 체험이 끝났어요</strong>
+<p>이름 없이도 ‘1번 곡’처럼 잘 저장돼요. 이름이 필요하면 <a href="https://dashboard.audd.io/" target="_blank" rel="noopener">AudD에 무료로 가입</a>(300곡까지 무료)하고 받은 토큰을 붙여넣으세요.</p>
+<div class="row"><input type="text" id="tokenInline" placeholder="토큰 붙여넣기" aria-label="AudD 토큰" autocomplete="off" autocapitalize="off" spellcheck="false"><button type="button" class="primary sm" id="tokenSave">확인</button></div>
+</div>
+<div class="tlwrap">
+<canvas id="tl" role="slider" tabindex="0" aria-label="전체 타임라인 (눌러서 그 지점부터 재생, 화살표 키로 이동)" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" aria-valuetext="0:00"></canvas>
+<div class="legend"><span>0:00</span><button type="button" id="stopBtn" class="sm" hidden>정지</button><span id="tlEnd"></span></div>
+</div>
+<div class="listhead"><h3 class="gh">곡 목록 · 누르면 고칠 수 있어요</h3><button type="button" class="sm" id="trashBtn" hidden></button></div>
+<ol class="segs cg" id="segs"></ol>
+<button type="button" id="addBtn" class="addrow">+ 직접 추가 (재생 위치부터 3분)</button>
+<p class="gf" id="fmtNote"></p>
+
+<details class="tune" id="tune">
+<summary>찾기 조정</summary>
 <div class="cg">
+<div class="cell col"><label for="sens">노래를 놓쳤나요, 대사까지 잡혔나요?</label><div class="slider"><span class="lbl" aria-hidden="true">대사 빼기</span><input type="range" id="sens" min="-3" max="3" step="1" value="0" aria-valuetext="보통"><span class="lbl" aria-hidden="true">노래 더 찾기</span></div></div>
 <div class="cell"><label for="minSong">최소 곡 길이</label><span class="val"><input type="number" id="minSong" min="10" max="900" step="5" value="60" inputmode="numeric">초</span></div>
 <div class="cell"><label for="gap">곡 사이 무음</label><span class="val"><input type="number" id="gap" min="0.5" max="10" step="0.1" value="2" inputmode="decimal">초</span></div>
 <div class="cell"><label for="autoName">노래 이름 자동으로 찾기</label><input type="checkbox" class="switch" id="autoName" role="switch" checked></div>
-<div class="cell col"><label for="auddToken">AudD 토큰 <span class="opt">(선택)</span></label><input type="text" id="auddToken" class="token" placeholder="없으면 무료 체험 한도까지만 돼요" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
-<div class="cell col"><label for="sens">감도</label><div class="slider"><span aria-hidden="true">엄격</span><input type="range" id="sens" min="-3" max="3" step="1" value="0" aria-valuetext="보통"><span aria-hidden="true">너그럽게</span></div></div>
+<div class="cell col"><label for="auddToken">AudD 토큰 <span class="opt">(선택)</span></label><input type="text" id="auddToken" class="token" placeholder="없으면 몇 곡만 체험돼요" autocomplete="off" autocapitalize="off" spellcheck="false"></div>
 </div>
-<p class="gf">최소 곡 길이보다 짧은 음악(징글·효과음)은 빼요. 노래끼리 붙어 있을 때 사이 무음이 이만큼 길면 다른 곡으로 나눠요. 노래를 놓치면 너그럽게, 말소리까지 잡히면 엄격하게.</p>
-<p class="gf">노래 이름은 <a href="https://dashboard.audd.io/" target="_blank" rel="noopener">AudD</a>가 찾아요. 토큰 없이는 몇 곡만 체험할 수 있어요. 무료 가입하면 300곡까지 무료(이후 1,000곡당 $5)예요. 토큰은 이 기기에만 저장돼요.</p>
+<p class="gf">짧은 음악(징글·효과음)은 최소 곡 길이로 빼요. 대사 없이 노래끼리 붙어 있으면 곡 사이 무음으로 나눠요. 토큰은 <a href="https://dashboard.audd.io/" target="_blank" rel="noopener">AudD</a>에서 무료로 받을 수 있고 이 기기에만 저장돼요.</p>
+</details>
 </section>
+<p id="status" class="vh" role="status" aria-live="polite"></p>
+<div id="toast" hidden><span id="toastMsg"></span><button type="button" id="undoBtn" hidden>되돌리기</button></div>
 </main>
 <footer>무료 · 로그인 없음</footer>
 
@@ -840,15 +877,29 @@ const Media = (() => {
 "use strict";
 (() => {
   const $ = (id) => document.getElementById(id);
-  const ui = { file: $("file"), drop: $("drop"), status: $("status"), prog: $("prog"), result: $("result"), brag: $("brag"), tl: $("tl"), tlEnd: $("tlEnd"), segs: $("segs"), zip: $("zipBtn"), zipLink: $("zipLink"), stop: $("stopBtn"), add: $("addBtn"), minSong: $("minSong"), gap: $("gap"), sens: $("sens"), fmtNote: $("fmtNote"), autoName: $("autoName"), token: $("auddToken") };
-  const st = { name: "", src: null, feat: null, det: null, segs: [], play: null, cursor: 0, busy: false, zipUrl: "", rec: { gen: 0, cache: [], blocked: "" } };
+  const ui = {
+    file: $("file"), drop: $("drop"), status: $("status"),
+    vStart: $("viewStart"), vWork: $("viewWork"), vResult: $("viewResult"),
+    prog: $("prog"), workName: $("workName"), workPct: $("workPct"), workEta: $("workEta"), cancel: $("cancelBtn"),
+    workError: $("workError"), workErrMsg: $("workErrMsg"), retry: $("retryBtn"), workTip: $("workTip"),
+    resTitle: $("resTitle"), resSub: $("resSub"), again: $("againBtn"), saveAll: $("saveAllBtn"), zipLink: $("zipLink"), saveHint: $("saveHint"),
+    nameCard: $("nameCard"), tokenInline: $("tokenInline"), tokenSave: $("tokenSave"),
+    tl: $("tl"), tlEnd: $("tlEnd"), stop: $("stopBtn"), segs: $("segs"), add: $("addBtn"), trash: $("trashBtn"), fmtNote: $("fmtNote"),
+    tune: $("tune"), minSong: $("minSong"), gap: $("gap"), sens: $("sens"), autoName: $("autoName"), token: $("auddToken"),
+    toast: $("toast"), toastMsg: $("toastMsg"), undo: $("undoBtn"),
+  };
+  const st = { name: "", fileLabel: "", src: null, feat: null, det: null, segs: [], play: null, cursor: 0, busy: false, loadGen: 0, trash: [], zipUrl: "", rec: { gen: 0, cache: [], blocked: "" } };
   const player = new Audio();
   const AR = 11025; // analysis sample rate
+  const UA = navigator.userAgent, TOUCH_MAC = navigator.maxTouchPoints > 1 && /Macintosh/.test(UA);
+  const IOS = /iPhone|iPad|iPod/.test(UA) || TOUCH_MAC, MAC = /Macintosh/.test(UA) && !TOUCH_MAC;
+  const MOBILE = IOS || /Android/i.test(UA);
   // Fallback full decode only: float PCM budget (assumes stereo). Phones get far less memory per tab.
-  const MOBILE = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1 && /Macintosh/.test(navigator.userAgent));
   const MEM_BUDGET = MOBILE ? 400e6 : 1.6e9;
   const RATES = [44100, 32000, 22050, 16000, 11025, 8000]; // WebKit accepts ≥ 3 kHz, spec floor 8 kHz
+  const SHARE_MAX_FILES = 10, SHARE_MAX_BYTES = 40e6; // Chromium rejects > 10 files / 50 MB; WebKit is flaky with big batches
   const store = { get: (k) => { try { return localStorage.getItem(k); } catch (_) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (_) { /* private mode */ } } };
+  const CANCELLED = new Error("cancelled");
 
   const pad = (x, w) => String(x).padStart(w, "0");
   function fmt(t) {
@@ -861,7 +912,9 @@ const Media = (() => {
   function fmtLong(t) {
     t = Math.round(t);
     const h = Math.floor(t / 3600), m = Math.floor(t / 60) % 60, s = t % 60;
-    return (h ? `${h}시간 ` : "") + (h || m ? `${m}분 ` : "") + `${s}초`;
+    if (h) return `${h}시간 ${m}분`;
+    if (m) return s ? `${m}분 ${s}초` : `${m}분`;
+    return `${s}초`;
   }
   function parseTime(str) {
     const p = String(str).trim().replace(/,/g, ".").split(":").map(Number); // comma-decimal keypads
@@ -870,9 +923,27 @@ const Media = (() => {
   }
   let lastSay = 0;
   const say = (msg) => { ui.status.textContent = msg; lastSay = Date.now(); };
-  // Percentages go to the live region at most every 3 s so screen readers aren't flooded;
-  // the <progress> bar shows every step.
-  const sayProgress = (msg) => { if (Date.now() - lastSay > 3000) say(msg); };
+  const sayProgress = (msg) => { if (Date.now() - lastSay > 5000) say(msg); }; // don't flood screen readers
+  const mb = (n) => `${(n / 1e6).toFixed(n < 1e7 ? 1 : 0)}MB`;
+  const cssVar = (k, d) => getComputedStyle(document.documentElement).getPropertyValue(k).trim() || d;
+  const tick = () => new Promise((r) => setTimeout(r, 0));
+
+  // ---- views ----
+  function show(view) {
+    for (const [k, el] of [["start", ui.vStart], ["work", ui.vWork], ["result", ui.vResult]]) el.hidden = k !== view;
+    window.scrollTo(0, 0);
+    const h = { start: $("hStart"), work: $("hWork"), result: ui.resTitle }[view];
+    if (h) h.focus({ preventScroll: true });
+    if (view === "result") draw();
+  }
+  let toastTimer = 0;
+  function toast(msg, undoFn) {
+    ui.toastMsg.textContent = msg; ui.toast.hidden = false; say(msg);
+    ui.undo.hidden = !undoFn; ui.undo.onclick = undoFn ? () => { hideToast(); undoFn(); } : null;
+    clearTimeout(toastTimer); toastTimer = setTimeout(hideToast, undoFn ? 6000 : 3500);
+  }
+  function hideToast() { ui.toast.hidden = true; }
+
   // Keep the screen on during long work: iOS suspends page scripts once the phone auto-locks.
   let wakeLock = null, wantWake = false;
   async function wake(on) {
@@ -887,16 +958,21 @@ const Media = (() => {
     } catch (_) { /* unsupported or denied: work continues, just may pause when the phone locks */ }
   }
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && wantWake) wake(true); });
-  const tick = () => new Promise((r) => setTimeout(r, 0));
-  function progress(v) {
-    ui.prog.hidden = v == null;
-    if (v === -1) ui.prog.removeAttribute("value"); else if (v != null) ui.prog.value = v;
-  }
-  const mb = (n) => `${(n / 1e6).toFixed(n < 1e7 ? 1 : 0)}MB`;
-  const cssVar = (k, d) => getComputedStyle(document.documentElement).getPropertyValue(k).trim() || d;
 
+  // ---- analysis ----
+  let workT0 = 0;
+  function workProgress(frac) {
+    ui.prog.value = frac;
+    ui.workPct.textContent = `${Math.floor(frac * 100)}%`;
+    const el = (performance.now() - workT0) / 1000;
+    if (frac > 0.04 && el > 2) {
+      const left = el / frac * (1 - frac);
+      ui.workEta.textContent = left < 60 ? `약 ${Math.max(1, Math.round(left / 5) * 5)}초 남음` : `약 ${Math.round(left / 60)}분 남음`;
+    }
+    sayProgress(`노래 찾는 중 ${Math.floor(frac * 100)}%`);
+  }
   // Fast path: decode 30 s slices (3 in flight) straight into the analyser.
-  async function analyzeSlices(src) {
+  async function analyzeSlices(src, gen) {
     const ctx = new OfflineAudioContext(1, 1, AR), an = new A2M.FrameAnalyzer(AR), SL = 30, n = Math.ceil(src.duration / SL), q = [];
     for (let k = 0, next = 0; k < n; k++) {
       while (q.length < 3 && next < n) {
@@ -904,13 +980,13 @@ const Media = (() => {
         p.catch(() => {}); // surfaced by the await below; avoids unhandled rejections for queued slices
         q.push(p);
       }
-      an.push(await q.shift());
-      progress((k + 1) / n);
-      sayProgress(`노래 구간 찾는 중… ${Math.floor((k + 1) / n * 100)}%`);
+      const x = await q.shift();
+      if (gen !== st.loadGen) throw CANCELLED;
+      an.push(x);
+      workProgress((k + 1) / n);
     }
     return an.result();
   }
-
   function probeDuration(file) {
     return new Promise((resolve) => {
       const url = URL.createObjectURL(file), a = document.createElement("audio");
@@ -923,83 +999,118 @@ const Media = (() => {
     });
   }
   // Fallback path for containers we can't index: decode everything at a memory-safe rate.
-  async function decodeWhole(file) {
+  async function decodeWhole(file, gen) {
     const dur = await probeDuration(file), est = dur || file.size * 8 / 64000; // unknown length: assume 64 kbps (= long)
     const rate = RATES.find((r) => est * r * 2 * 4 <= MEM_BUDGET) || RATES[RATES.length - 1];
-    say(`오디오 여는 중…${dur ? ` (${fmtLong(dur)}짜리라 조금 걸릴 수 있어요)` : ""}`);
+    ui.prog.removeAttribute("value"); ui.workPct.textContent = "여는 중…";
     // Out-of-memory and unsupported formats both surface as decode errors: step the rate down
     // (each attempt needs a fresh copy; decodeAudioData detaches its input) before giving up.
     let buf = null;
     for (const r of RATES.filter((x) => x <= rate)) {
       try { buf = await new OfflineAudioContext(1, 1, r).decodeAudioData(await file.arrayBuffer()); break; }
       catch (_) { /* try a lower rate */ }
+      if (gen !== st.loadGen) throw CANCELLED;
     }
-    if (!buf) throw new Error("이 파일은 브라우저가 읽을 수 없어요. m4a·mp3·wav 파일로 다시 시도해 주세요.");
+    if (gen !== st.loadGen) throw CANCELLED;
+    if (!buf) throw new Error("이 녹음은 열 수 없어요. 음성 메모에서 ‘파일에 저장’으로 만든 m4a처럼 일반 오디오 파일을 골라 주세요.");
     const chs = Array.from({ length: buf.numberOfChannels }, (_, i) => buf.getChannelData(i));
     const d = A2M.analysisFactor(buf.sampleRate), an = new A2M.FrameAnalyzer(buf.sampleRate / d);
     const step = d * Math.floor(buf.sampleRate * 30 / d);
     for (let p = 0; p < buf.length; p += step) {
       an.push(A2M.decimateMono(chs, p, Math.min(buf.length, p + step), d));
-      progress(p / buf.length);
-      sayProgress(`노래 구간 찾는 중… ${Math.floor(p / buf.length * 100)}%`);
+      workProgress(Math.min(1, (p + step) / buf.length));
       await tick();
+      if (gen !== st.loadGen) throw CANCELLED;
     }
     return { src: Media.pcmSource(buf), feat: an.result() };
   }
 
+  function resetWork() {
+    ui.workError.hidden = true; ui.cancel.hidden = false; ui.workTip.hidden = false;
+    ui.prog.hidden = false; ui.vWork.querySelector(".spin").hidden = false; $("hWork").textContent = "노래 찾는 중";
+    ui.prog.value = 0; ui.workPct.textContent = "0%"; ui.workEta.textContent = "";
+  }
+  function workFailed(msg) {
+    $("hWork").textContent = /짧아요/.test(msg) ? "녹음이 너무 짧아요" : "이 녹음은 열 수 없어요";
+    ui.vWork.querySelector(".spin").hidden = true; ui.prog.hidden = true; ui.workPct.textContent = ""; ui.workEta.textContent = "";
+    ui.workErrMsg.textContent = msg; ui.workError.hidden = false; ui.cancel.hidden = true; ui.workTip.hidden = true;
+    say(msg);
+  }
+
   async function handleFile(file) {
-    if (!file || st.busy) return;
+    if (!file) return;
     document.dispatchEvent(new Event("a2m:file"));
-    st.busy = true;
-    wake(true);
-    stopPlay();
-    clearZipLink();
-    st.rec.gen++; st.rec.cache = [];
-    st.src = st.feat = st.det = null; st.segs = []; ui.result.hidden = true;
+    const gen = ++st.loadGen;
+    st.busy = true; wake(true);
+    stopPlay(); clearZipLink(); hideToast();
+    st.rec.gen++; st.rec.cache = []; st.rec.blocked = "";
+    st.src = st.feat = st.det = null; st.segs = []; st.trash = [];
+    st.fileLabel = file.name;
     st.name = file.name.replace(/\.[^.]+$/, "").replace(/[\\/:*?"<>|]+/g, "_") || "audio";
+    resetWork(); ui.workName.textContent = file.name; workT0 = performance.now();
+    show("work"); say("노래 찾는 중");
     try {
-      say("파일 여는 중…"); progress(-1);
       let src = await Media.open(file), feat = null;
+      if (gen !== st.loadGen) return;
+      if (src && src.duration < 10) throw new Error("노래가 들어 있는 긴 녹음(대사와 노래가 섞인 녹음)을 골라 주세요. 이 녹음은 너무 짧아요.");
       if (src) {
-        try { feat = await analyzeSlices(src); } catch (_) { src = null; } // codec not decodable in slices
+        try { feat = await analyzeSlices(src, gen); } catch (e) { if (e === CANCELLED) return; src = null; } // codec not decodable in slices
       }
-      if (!src) ({ src, feat } = await decodeWhole(file));
+      if (!src) ({ src, feat } = await decodeWhole(file, gen));
+      if (gen !== st.loadGen) return;
+      if (src.duration < 10) throw new Error("노래가 들어 있는 긴 녹음(대사와 노래가 섞인 녹음)을 골라 주세요. 이 녹음은 너무 짧아요.");
       st.src = src; st.feat = feat;
-      progress(null);
-      runDetect();
+      runDetect({ first: true });
+      show("result");
     } catch (err) {
-      progress(null);
-      say(err.message || "문제가 생겼어요. 다시 시도해 주세요.");
+      if (err === CANCELLED || gen !== st.loadGen) return;
+      workFailed(err.message || "문제가 생겼어요. 다시 시도해 주세요.");
     } finally {
-      st.busy = false;
-      wake(false);
+      if (gen === st.loadGen) { st.busy = false; wake(false); }
       ui.file.value = "";
     }
   }
-
-  function runDetect() {
-    if (!st.feat) return;
-    stopPlay();
-    clearZipLink();
-    const opts = { minSong: +ui.minSong.value || A2M.DEFAULTS.minSong, gap: +ui.gap.value || A2M.DEFAULTS.gap, sens: +ui.sens.value || 0 };
-    st.det = A2M.detect(st.feat, opts);
-    const dur = st.src.duration;
-    st.segs = st.det.segments.map((s) => ({ start: s.start, end: Math.min(dur, s.end), on: true, name: "", nameEdited: false, rec: "" }));
-    const music = st.segs.reduce((a, s) => a + s.end - s.start, 0);
-    say(st.segs.length ? `노래 ${st.segs.length}곡을 찾았어요.` : "노래를 찾지 못했어요. 설정에서 감도를 너그럽게 바꿔 보세요.");
-    ui.brag.textContent = `전체 ${fmtLong(dur)} 중 노래 ${fmtLong(music)} · 나머지 ${fmtLong(dur - music)}는 뺐어요`;
-    ui.fmtNote.textContent = st.src.kind === "pcm"
-      ? `WAV로 저장돼요(${st.src.buffer.sampleRate / 1000}kHz${st.src.buffer.sampleRate < 44100 ? ", 긴 파일이라 낮춤" : ""}).`
-      : `원본과 같은 ${st.src.ext.toUpperCase()}로 저장돼요(다시 인코딩하지 않아 음질 그대로).`;
-    ui.tlEnd.textContent = fmtShort(dur);
-    ui.result.hidden = false;
-    renderList();
-    draw();
-    recognizeAll();
+  function cancelWork() {
+    st.loadGen++; st.busy = false; wake(false);
+    show("start"); say("취소했어요");
   }
 
-  // ---- Song names via AudD (https://docs.audd.io): one 15 s clip per song, a second window if
-  // the first finds nothing. Clips are cached by position so re-detection doesn't resend them.
+  // ---- detection + result header ----
+  function detectOpts() { return { minSong: +ui.minSong.value || A2M.DEFAULTS.minSong, gap: +ui.gap.value || A2M.DEFAULTS.gap, sens: +ui.sens.value || 0 }; }
+  function runDetect({ first = false } = {}) {
+    if (!st.feat) return;
+    stopPlay(); clearZipLink();
+    st.det = A2M.detect(st.feat, detectOpts());
+    // Nothing found on the first pass: try one step more lenient before giving up.
+    if (first && !st.det.segments.length && +ui.sens.value < 3) {
+      ui.sens.value = String(+ui.sens.value + 1); sensText();
+      st.det = A2M.detect(st.feat, detectOpts());
+    }
+    const dur = st.src.duration;
+    st.segs = st.det.segments.map((s) => ({ start: s.start, end: Math.min(dur, s.end), name: "", nameEdited: false, rec: "", open: false }));
+    st.trash = [];
+    ui.fmtNote.textContent = st.src.kind === "pcm"
+      ? `WAV로 저장돼요(${st.src.buffer.sampleRate / 1000}kHz${st.src.buffer.sampleRate < 44100 ? ", 긴 파일이라 낮춤" : ""}).`
+      : `원본과 같은 ${st.src.ext.toUpperCase()}로 저장돼요. 다시 인코딩하지 않아 음질 그대로예요.`;
+    ui.tlEnd.textContent = fmtShort(dur);
+    ui.nameCard.hidden = true;
+    renderList(); updateHeader(); draw();
+    if (!st.segs.length) ui.tune.open = true;
+    say(st.segs.length ? `노래 ${st.segs.length}곡을 찾았어요` : "노래를 찾지 못했어요");
+    recognizeAll();
+  }
+  function updateHeader() {
+    const n = st.segs.length, dur = st.src.duration, music = st.segs.reduce((a, s) => a + s.end - s.start, 0);
+    ui.resTitle.textContent = n ? `노래 ${n}곡` : "노래를 못 찾았어요";
+    ui.resSub.textContent = n
+      ? `${st.fileLabel} · ${fmtLong(dur)} 중 노래 ${fmtLong(music)}`
+      : `${st.fileLabel} · 대사와 노래가 섞인 녹음이 맞나요? 아래 ‘찾기 조정’에서 ‘노래 더 찾기’ 쪽으로 옮기거나, 타임라인에서 위치를 고른 뒤 ‘직접 추가’를 눌러 보세요.`;
+    ui.saveAll.hidden = !n; ui.saveAll.textContent = n > 1 ? `${n}곡 모두 저장` : "저장";
+    ui.trash.hidden = !st.trash.length; ui.trash.textContent = `지운 곡 되돌리기 (${st.trash.length})`;
+  }
+
+  // ---- song names via AudD (https://docs.audd.io): one 15 s clip per song, a second window if the
+  // first finds nothing. Clips are cached by position so re-detection doesn't resend them.
   const CLIP = 15;
   function applyMatch(s, m) {
     s.rec = "ok"; s.artist = m.artist || ""; s.title = m.title || "";
@@ -1047,8 +1158,7 @@ const Media = (() => {
         catch (e) {
           if (gen !== st.rec.gen) return; // a stale request from a superseded pass must not overwrite state
           s.rec = "error";
-          if (e.code === 901) st.rec.blocked = "무료 체험 한도를 다 썼어요. 설정에 AudD 토큰을 넣으면 계속 찾을 수 있어요.";
-          else if (e.code === 900) st.rec.blocked = "AudD 토큰이 올바르지 않아요. 설정에서 확인해 주세요.";
+          if (e.code === 901 || e.code === 900) { st.rec.blocked = e.code; s.rec = "skipped"; }
         }
         if (gen !== st.rec.gen) return;
         refreshRow(s);
@@ -1056,95 +1166,133 @@ const Media = (() => {
     };
     await Promise.all([worker(), worker()]);
     if (gen !== st.rec.gen) return;
-    todo.forEach((s) => { if (s.rec === "pending") s.rec = ""; });
-    const named = st.segs.filter((s) => s.rec === "ok").length, failed = st.segs.filter((s) => s.rec === "error").length;
-    say(st.rec.blocked || `노래 ${st.segs.length}곡 중 ${named}곡의 이름을 찾았어요.` +
-      (failed ? ` ${failed}곡은 연결 문제로 실패했어요. 설정의 '노래 이름 자동으로 찾기'를 껐다 켜면 다시 시도해요.` : ""));
+    todo.forEach((s) => { if (s.rec === "pending") s.rec = st.rec.blocked ? "skipped" : ""; });
     st.segs.forEach(refreshRow);
+    if (st.rec.blocked) {
+      $("nameCardTitle").textContent = st.rec.blocked === 900 ? "AudD 토큰이 맞지 않아요" : "노래 이름 찾기 무료 체험이 끝났어요";
+      ui.nameCard.hidden = false;
+    }
+    const named = st.segs.filter((s) => s.rec === "ok").length, failed = st.segs.filter((s) => s.rec === "error").length;
+    if (failed) toast(`${failed}곡은 연결 문제로 이름을 못 찾았어요`);
+    else say(`${st.segs.length}곡 중 ${named}곡의 이름을 찾았어요`);
+  }
+  function retryNames() {
+    st.rec.blocked = "";
+    st.segs.forEach((s) => { if (s.rec === "skipped" || s.rec === "error") s.rec = ""; });
+    recognizeAll();
   }
 
-  const canShare = (f) => { try { return !!(navigator.canShare && navigator.canShare({ files: [f] })); } catch (_) { return false; } };
+  // ---- list ----
+  const canShareFiles = (files) => { try { return !!(navigator.canShare && navigator.canShare({ files })); } catch (_) { return false; } };
   const svg = (d) => `<svg viewBox="0 0 14 14" aria-hidden="true"><path d="${d}"/></svg>`;
   const ICON_PLAY = svg("M3 1.5v11l9.5-5.5z"), ICON_STOP = svg("M2.5 2.5h9v9h-9z");
-  const REC_TEXT = { pending: ["tag", "이름 찾는 중…"], none: ["", "이름을 못 찾았어요"], error: ["bad", "이름 찾기 실패"] };
-  function fillMeta(s, i, ttl, sub) {
-    ttl.textContent = s.name || `${i + 1}번 곡`;
-    sub.textContent = `${i + 1}번 · ${fmtShort(s.start)}–${fmtShort(s.end)} · ${fmtShort(s.end - s.start)}`;
-    if (REC_TEXT[s.rec]) { const t = document.createElement("span"); t.className = REC_TEXT[s.rec][0]; t.textContent = ` · ${REC_TEXT[s.rec][1]}`; sub.append(t); }
+  const REC_TEXT = { pending: ["tag", "이름 찾는 중…"], none: ["", "이름을 못 찾았어요"], error: ["bad", "이름 찾기 실패"], skipped: ["", "이름 찾기 체험 끝"] };
+  const label = (s, i) => s.name || `${i + 1}번 곡`;
+  function fillMeta(s, i, ttl, len) {
+    ttl.textContent = label(s, i);
+    len.textContent = `${fmtShort(s.start)}–${fmtShort(s.end)} · ${fmtShort(s.end - s.start)}`;
+    if (REC_TEXT[s.rec]) { const t = document.createElement("span"); t.className = REC_TEXT[s.rec][0]; t.textContent = ` · ${REC_TEXT[s.rec][1]}`; len.append(t); }
   }
-  // Recognition results land while the user may be typing in another row: update that song's row
-  // in place instead of re-rendering (a rebuild would drop the focused input and the iOS keyboard).
+  // Updates one row in place (a rebuild would drop focus and the iOS keyboard mid-edit).
   function refreshRow(s) {
     const i = st.segs.indexOf(s), li = ui.segs.children[i];
     if (i < 0 || !li) return;
     fillMeta(s, i, li.querySelector(".ttl"), li.querySelector(".len"));
     const nameIn = li.querySelector("input.name");
     if (nameIn && document.activeElement !== nameIn && !s.nameEdited) nameIn.value = s.name;
+    li.querySelectorAll(".tv").forEach((el) => { el.value = fmt(s[el.dataset.key]); });
   }
+  function el(tag, props = {}, ...kids) {
+    const e = document.createElement(tag);
+    for (const [k, v] of Object.entries(props)) {
+      if (k === "aria") for (const [a, b] of Object.entries(v)) e.setAttribute(a, b);
+      else if (k === "on") for (const [a, b] of Object.entries(v)) e.addEventListener(a, b);
+      else e[k] = v;
+    }
+    e.append(...kids);
+    return e;
+  }
+  const btn = (text, aria, fn, cls = "") => el("button", { type: "button", className: cls, textContent: text, aria: { "aria-label": aria }, on: { click: fn } });
 
+  function setTime(s, key, t) {
+    const dur = st.src.duration;
+    t = Math.max(0, Math.min(dur, t));
+    if (key === "start") t = Math.min(t, s.end - 1); else t = Math.max(t, s.start + 1);
+    s[key] = Math.round(t * 10) / 10;
+    refreshRow(s); clearZipLink(); draw(); updateHeader();
+    if (s.rec !== "ok") { s.rec = s.rec === "pending" ? "pending" : ""; clearTimeout(setTime.timer); setTime.timer = setTimeout(recognizeAll, 1500); }
+  }
   function renderList() {
     ui.segs.textContent = "";
-    const dur = st.src.duration;
-    const shareable = canShare(new File([new Blob()], `x.${st.src.ext}`, { type: st.src.mime }));
+    const sharing = MOBILE && canShareFiles([new File([new Blob()], `x.${st.src.ext}`, { type: st.src.mime })]);
     st.segs.forEach((s, i) => {
-      const li = document.createElement("li");
-      li.className = (s.on ? "" : "off") + (st.play && st.play.idx === i ? " playing" : "");
-      const chk = document.createElement("input");
-      chk.type = "checkbox"; chk.checked = s.on; chk.setAttribute("aria-label", `${i + 1}번 곡 ZIP에 포함`);
-      const chkhit = document.createElement("label"); chkhit.className = "chkhit"; chkhit.append(chk);
-      chk.onchange = () => { s.on = chk.checked; li.classList.toggle("off", !s.on); clearZipLink(); ui.zip.disabled = !st.segs.some((x) => x.on); draw(); };
-      const meta = document.createElement("div"); meta.className = "meta";
-      const ttl = document.createElement("div"); ttl.className = "ttl";
-      const sub = document.createElement("div"); sub.className = "len";
-      fillMeta(s, i, ttl, sub);
-      meta.append(ttl, sub);
-      const playing = st.play && st.play.idx === i;
-      const play = document.createElement("button");
-      play.type = "button"; play.className = "play"; play.innerHTML = playing ? ICON_STOP : ICON_PLAY;
-      play.setAttribute("aria-label", playing ? `${i + 1}번 곡 정지` : `${i + 1}번 곡 미리듣기`);
+      const n = i + 1, li = el("li");
+      const ttl = el("span", { className: "ttl" }), len = el("span", { className: "len" });
+      fillMeta(s, i, ttl, len);
+      const row = el("button", { type: "button", className: "row", aria: { "aria-expanded": String(s.open), "aria-controls": `edit-${n}` } },
+        el("span", { className: "idx", textContent: String(n), aria: { "aria-hidden": "true" } }),
+        el("span", { className: "meta" }, ttl, len),
+        el("span", { className: "chev", aria: { "aria-hidden": "true" } }));
+      const play = el("button", { type: "button", className: "play", innerHTML: ICON_PLAY, aria: { "aria-label": `${n}번 곡 미리듣기` } });
       play.onclick = () => (st.play && st.play.idx === i) ? stopPlay() : playFrom(s.start, s.end, i);
 
-      const times = document.createElement("div"); times.className = "times";
-      const nm = document.createElement("label"); nm.className = "nm";
-      const nameIn = document.createElement("input"); nameIn.type = "text"; nameIn.className = "name"; nameIn.value = s.name;
-      nameIn.placeholder = "노래 이름 (파일 이름이 돼요)"; nameIn.setAttribute("aria-label", `${i + 1}번 곡 이름`);
-      nameIn.onchange = () => { s.name = nameIn.value.trim(); s.nameEdited = true; ttl.textContent = s.name || `${i + 1}번 곡`; clearZipLink(); };
-      nm.append("이름", nameIn);
-      const mk = (label, key) => {
-        const l = document.createElement("label");
-        const inp = document.createElement("input"); inp.type = "text"; inp.value = fmt(s[key]); inp.inputMode = "decimal";
-        inp.setAttribute("aria-label", `${i + 1}번 곡 ${label} 시간`);
-        inp.onchange = () => {
-          const t = parseTime(inp.value);
-          if (isFinite(t) && t <= dur) s[key] = t;
-          if (s.end - s.start < 1) s[key] = key === "start" ? Math.max(0, s.end - 1) : Math.min(dur, s.start + 1);
-          if (s.rec !== "pending") s.rec = "";
-          inp.value = fmt(s[key]); refreshRow(s); clearZipLink(); draw(); recognizeAll();
-        };
-        l.append(label, inp);
-        return l;
+      const edit = el("div", { className: "edit", id: `edit-${n}`, hidden: !s.open });
+      row.onclick = () => { s.open = !s.open; edit.hidden = !s.open; row.setAttribute("aria-expanded", String(s.open)); };
+      const nameIn = el("input", { type: "text", className: "name", value: s.name, placeholder: "노래 이름 (파일 이름이 돼요)", aria: { "aria-label": `${n}번 곡 이름` } });
+      nameIn.onchange = () => { s.name = nameIn.value.trim(); s.nameEdited = true; refreshRow(s); clearZipLink(); };
+      const timeRow = (lbl, key) => {
+        const inp = el("input", { type: "text", className: "tv", value: fmt(s[key]), aria: { "aria-label": `${n}번 곡 ${lbl} 시간` } });
+        inp.dataset.key = key;
+        inp.onchange = () => { const t = parseTime(inp.value); if (isFinite(t)) setTime(s, key, t); else inp.value = fmt(s[key]); };
+        const nudge = (d) => btn(`${d > 0 ? "+" : "−"}${Math.abs(d)}초`, `${n}번 곡 ${lbl} ${Math.abs(d)}초 ${d > 0 ? "뒤로" : "앞으로"}`, () => setTime(s, key, s[key] + d));
+        const listen = key === "start"
+          ? btn("처음 듣기", `${n}번 곡 처음 10초 듣기`, () => playFrom(s.start, Math.min(s.end, s.start + 10), i))
+          : btn("끝 10초", `${n}번 곡 끝 10초 듣기`, () => playFrom(Math.max(s.start, s.end - 10), s.end, i));
+        return el("div", { className: "tgroup" },
+          el("div", { className: "trow" }, el("span", { className: "tl", textContent: lbl }), inp, listen),
+          el("div", { className: "trow" }, nudge(-5), nudge(-1), nudge(1), nudge(5),
+            btn("지금 위치로", `${n}번 곡 ${lbl}을 재생 위치로`, () => setTime(s, key, curTime()))));
       };
-      times.append(nm, mk("시작", "start"), mk("끝", "end"));
-
-      const acts = document.createElement("div"); acts.className = "acts";
-      const btn = (txt, aria, fn, cls) => { const b = document.createElement("button"); b.type = "button"; b.textContent = txt; b.setAttribute("aria-label", aria); if (cls) b.className = cls; b.onclick = fn; return b; };
-      acts.append(
-        btn("끝 10초", `${i + 1}번 곡 끝 10초 듣기`, () => playFrom(Math.max(s.start, s.end - 10), s.end, i)),
-        btn("저장", `${i + 1}번 곡 저장`, () => saveOne(i)),
-      );
-      if (shareable) acts.append(btn("공유", `${i + 1}번 곡 공유 (파일에 저장·메신저)`, () => shareOne(i)));
-      acts.append(btn("삭제", `${i + 1}번 구간 삭제`, () => { if (st.play && st.play.idx === i) stopPlay(); st.segs.splice(i, 1); clearZipLink(); renderList(); draw(); }, "danger"));
-      li.append(chkhit, meta, play, times, acts);
+      const acts = el("div", { className: "acts" }, btn("이 곡 저장", `${n}번 곡 저장`, () => saveOne(i)));
+      if (sharing) acts.append(btn("공유", `${n}번 곡 공유`, () => shareOne(i)));
+      acts.append(btn("삭제", `${n}번 곡 삭제`, () => removeSeg(i), "danger"));
+      edit.append(el("label", { className: "f" }, "이름", nameIn), timeRow("시작", "start"), timeRow("끝", "end"), acts);
+      li.append(row, play, edit);
       ui.segs.append(li);
     });
-    ui.zip.disabled = !st.segs.some((s) => s.on);
+    markPlaying();
+  }
+  function removeSeg(i) {
+    if (st.play && st.play.idx != null) stopPlay();
+    const [s] = st.segs.splice(i, 1);
+    st.trash.push({ s, i });
+    clearZipLink(); renderList(); draw(); updateHeader();
+    toast(`${label(s, i)} 삭제됨`, restoreLast);
+  }
+  function restoreLast() {
+    const t = st.trash.pop();
+    if (!t) return;
+    st.segs.splice(Math.min(t.i, st.segs.length), 0, t.s);
+    clearZipLink(); renderList(); draw(); updateHeader();
+    say(`${label(t.s, t.i)} 되돌렸어요`);
+  }
+  function addSeg() {
+    if (!st.src) return;
+    const dur = st.src.duration, start = Math.min(st.cursor, Math.max(0, dur - 1));
+    const s = { start, end: Math.min(dur, start + 180), name: "", nameEdited: false, rec: "", open: true };
+    st.segs.push(s); st.segs.sort((a, b) => a.start - b.start);
+    clearZipLink(); renderList(); draw(); updateHeader();
+    const li = ui.segs.children[st.segs.indexOf(s)];
+    li.scrollIntoView({ block: "center", behavior: "smooth" });
+    toast(`${fmtShort(start)}부터 3분짜리 곡을 추가했어요. 시작·끝을 맞춰 주세요.`);
+    clearTimeout(setTime.timer); setTime.timer = setTimeout(recognizeAll, 1500);
   }
 
-  // Timeline: bars = music score per second (accent inside a kept song, grey elsewhere),
-  // outlines = song ranges (dashed when unchecked), red line = playhead.
+  // ---- timeline ----
+  // Bars = music score per second (accent inside a song, grey elsewhere), outlines = songs, red = playhead.
   function draw() {
     const cv = ui.tl, dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
-    if (!w || !st.det) return;
+    if (!w || !st.det || !st.src) return;
     cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
     const g = cv.getContext("2d"), dur = st.src.duration, accent = cssVar("--accent", "#007AFF"), grey = cssVar("--label2", "#888");
     g.scale(dpr, dpr); g.clearRect(0, 0, w, h);
@@ -1153,52 +1301,57 @@ const Media = (() => {
       const a = Math.floor(x / cols * sc.length), b = Math.max(a + 1, Math.floor((x + 1) / cols * sc.length));
       let m = 0; for (let i = a; i < b; i++) m += sc[i];
       const v = (m / (b - a) + 1) / 2, bh = Math.max(2, v * (h - 12)), mid = (a + b) / 2;
-      const inSong = st.segs.some((s) => s.on && mid >= s.start && mid < s.end);
+      const inSong = st.segs.some((s) => mid >= s.start && mid < s.end);
       g.fillStyle = inSong ? accent : grey; g.globalAlpha = inSong ? 1 : 0.35;
       const bw = Math.max(1, w / cols - 1);
       g.beginPath(); g.roundRect ? g.roundRect(x * w / cols, (h - bh) / 2, bw, bh, bw / 2) : g.rect(x * w / cols, (h - bh) / 2, bw, bh); g.fill();
     }
     g.globalAlpha = 1; g.strokeStyle = accent; g.lineWidth = 1.5;
     st.segs.forEach((s) => {
-      g.setLineDash(s.on ? [] : [4, 3]);
       g.beginPath(); g.roundRect ? g.roundRect(s.start / dur * w + 1, 1, Math.max(1, (s.end - s.start) / dur * w - 2), h - 2, 6) : g.rect(s.start / dur * w, 1, (s.end - s.start) / dur * w, h - 2); g.stroke();
     });
-    g.setLineDash([]);
     g.fillStyle = cssVar("--red", "#FF3B30"); g.fillRect(curTime() / dur * w - 1, 0, 2, h);
-    syncSlider();
-  }
-  // Keep the timeline's slider semantics in sync with what is painted.
-  function syncSlider() {
-    if (!st.src) return;
     const t = curTime();
-    ui.tl.setAttribute("aria-valuemax", String(Math.round(st.src.duration)));
-    ui.tl.setAttribute("aria-valuenow", String(Math.round(t)));
-    ui.tl.setAttribute("aria-valuetext", fmtShort(t));
+    cv.setAttribute("aria-valuemax", String(Math.round(dur)));
+    cv.setAttribute("aria-valuenow", String(Math.round(t)));
+    cv.setAttribute("aria-valuetext", fmtShort(t));
   }
+  function playFromCursor() {
+    const dur = st.src.duration;
+    // The decoded fallback renders WAV on the fly, so keep that clip short.
+    playFrom(st.cursor, Math.min(dur, st.cursor + (st.src.kind === "pcm" ? 120 : 600)), null);
+  }
+  // Touch/mouse: press and drag to scrub, release to play from there.
+  let scrubbing = false;
+  const seekTo = (e) => { const r = ui.tl.getBoundingClientRect(); st.cursor = Math.max(0, Math.min(st.src.duration, (e.clientX - r.left) / r.width * st.src.duration)); draw(); };
+  ui.tl.addEventListener("pointerdown", (e) => { if (!st.src) return; scrubbing = true; ui.tl.setPointerCapture(e.pointerId); stopPlay(); seekTo(e); });
+  ui.tl.addEventListener("pointermove", (e) => { if (scrubbing) seekTo(e); });
+  ui.tl.addEventListener("pointerup", (e) => { if (!scrubbing) return; scrubbing = false; seekTo(e); playFromCursor(); });
+  ui.tl.addEventListener("pointercancel", () => { scrubbing = false; });
+  ui.tl.addEventListener("keydown", (e) => {
+    if (!st.src) return;
+    const dur = st.src.duration, steps = { ArrowLeft: -5, ArrowDown: -5, ArrowRight: 5, ArrowUp: 5, PageDown: -30, PageUp: 30 };
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); playFromCursor(); return; }
+    let t;
+    if (e.key in steps) t = curTime() + steps[e.key];
+    else if (e.key === "Home") t = 0;
+    else if (e.key === "End") t = dur;
+    else return;
+    e.preventDefault(); stopPlay();
+    st.cursor = Math.max(0, Math.min(dur, t)); draw();
+  });
 
-  // Playback through <audio> (not Web Audio): plays with the iPhone silent switch on, and the clip
-  // is built synchronously so play() stays inside the tap gesture.
+  // ---- playback through <audio>: plays with the iPhone silent switch on, and the clip is built
+  // synchronously so play() stays inside the tap gesture.
   function curTime() { return st.play ? Math.min(st.play.end, st.play.base + player.currentTime) : st.cursor; }
-  // Update only the playing row's state instead of rebuilding the whole list
-  // (a rebuild would drop focus and scroll position mid-playback).
-  function markPlaying() {
-    [...ui.segs.children].forEach((li, i) => {
-      const playing = st.play && st.play.idx === i;
-      li.classList.toggle("playing", !!playing);
-      const play = li.querySelector("button.play");
-      if (!play) return;
-      play.innerHTML = playing ? ICON_STOP : ICON_PLAY;
-      play.setAttribute("aria-label", playing ? `${i + 1}번 곡 정지` : `${i + 1}번 곡 미리듣기`);
-    });
-  }
   function playFrom(t0, t1, idx) {
     stopPlay();
     const c = st.src.cut(t0, t1), url = URL.createObjectURL(c.blob);
     st.play = { base: c.t0, end: c.t1, idx, url };
     player.src = url;
     player.onended = () => { if (st.play && st.play.url === url) stopPlay(); };
-    player.play().catch(() => { if (st.play && st.play.url === url) { stopPlay(); say("재생이 막혔어요. 한 번 더 눌러 주세요."); } });
-    if (idx != null) markPlaying();
+    player.play().catch(() => { if (st.play && st.play.url === url) { stopPlay(); toast("재생이 막혔어요. 한 번 더 눌러 주세요."); } });
+    markPlaying();
     const loop = () => { if (!st.play || st.play.url !== url) return; draw(); requestAnimationFrame(loop); };
     requestAnimationFrame(loop);
   }
@@ -1206,29 +1359,58 @@ const Media = (() => {
     const was = st.play;
     if (was) { st.cursor = curTime(); player.pause(); player.removeAttribute("src"); player.load(); URL.revokeObjectURL(was.url); }
     st.play = null;
-    if (was && was.idx != null) markPlaying();
-    draw();
+    markPlaying(); draw();
+  }
+  function markPlaying() {
+    ui.stop.hidden = !st.play;
+    [...ui.segs.children].forEach((li, i) => {
+      const on = !!(st.play && st.play.idx === i), b = li.querySelector("button.play");
+      li.classList.toggle("playing", on);
+      b.innerHTML = on ? ICON_STOP : ICON_PLAY;
+      b.setAttribute("aria-label", `${i + 1}번 곡 ${on ? "정지" : "미리듣기"}`);
+    });
   }
 
+  // ---- saving ----
   const safe = (x) => x.replace(/[\\/:*?"<>|\u0000-\u001f]+/g, "_").replace(/^[.\s]+|[.\s]+$/g, "").slice(0, 120);
   function fileName(i) {
     const s = st.segs[i], n = safe(s.name || "");
-    return n ? `${pad(i + 1, 2)} ${n}.${st.src.ext}` : `${st.name}_${pad(i + 1, 2)}_${fmt(s.start).replace(/[:.]/g, "-")}.${st.src.ext}`;
+    return n ? `${pad(i + 1, 2)} ${n}.${st.src.ext}` : `${st.name} ${pad(i + 1, 2)}번 곡.${st.src.ext}`;
   }
+  const songFile = (i) => new File([st.src.cut(st.segs[i].start, st.segs[i].end).blob], fileName(i), { type: st.src.mime });
   function download(blob, name) {
     const url = URL.createObjectURL(blob), a = document.createElement("a");
     a.href = url; a.download = name; document.body.append(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 5 * 60000); // mobile browsers may start the transfer late
   }
   function saveOne(i) {
-    const s = st.segs[i];
-    download(st.src.cut(s.start, s.end).blob, fileName(i));
+    const f = songFile(i);
+    download(f, f.name);
+    toast(IOS ? `${label(st.segs[i], i)} 저장 · 파일 앱 › 다운로드` : `${label(st.segs[i], i)} 저장했어요`);
   }
   function shareOne(i) {
-    const s = st.segs[i], f = new File([st.src.cut(s.start, s.end).blob], fileName(i), { type: st.src.mime });
-    navigator.share({ files: [f], title: s.name || f.name }).catch((e) => { if (e && e.name !== "AbortError") download(f, f.name); });
+    const f = songFile(i);
+    navigator.share({ files: [f], title: f.name }).catch((e) => { if (e && e.name !== "AbortError") download(f, f.name); });
   }
-
+  // iPhone/Android: everything at once through the share sheet ("파일에 저장" saves them all).
+  // Too many/too big for the share sheet, or desktop: one ZIP.
+  function saveAll() {
+    const n = st.segs.length;
+    if (!n) return;
+    if (MOBILE) {
+      const files = st.segs.map((_, i) => songFile(i)), bytes = files.reduce((a, f) => a + f.size, 0);
+      if (files.length <= SHARE_MAX_FILES && bytes <= SHARE_MAX_BYTES && canShareFiles(files)) {
+        ui.saveHint.innerHTML = "공유 메뉴에서 <b>파일에 저장</b>을 고르면 한 번에 저장돼요."; ui.saveHint.hidden = false;
+        navigator.share({ files, title: `노래 ${n}곡` }).catch((e) => {
+          if (e && e.name === "AbortError") return;
+          toast("공유 메뉴로 보내지 못했어요. ZIP으로 만들게요."); saveZip();
+        });
+        return;
+      }
+      if (n > 1) toast(`곡이 많아 한 번에 보내지 못해요. ZIP으로 만들게요.`);
+    }
+    saveZip();
+  }
   let zipGen = 0;
   function clearZipLink() {
     zipGen++; // also invalidates a ZIP still being built
@@ -1238,57 +1420,71 @@ const Media = (() => {
   // Building the ZIP is async (CRC needs the bytes), which ends the tap gesture; mobile browsers may
   // then ignore an automatic download, so a real link is left for a fresh tap.
   async function saveZip() {
-    const idx = st.segs.map((s, i) => s.on ? i : -1).filter((i) => i >= 0);
-    if (!idx.length) return;
+    const n = st.segs.length;
     clearZipLink();
-    ui.zip.disabled = true;
-    wake(true);
+    const g = zipGen, label0 = ui.saveAll.textContent;
+    ui.saveAll.disabled = true; wake(true);
     try {
-      const files = idx.map((i) => ({ name: fileName(i), blob: st.src.cut(st.segs[i].start, st.segs[i].end).blob }));
-      const g = zipGen;
-      const blob = await Media.zip(files, (k) => { sayProgress(`ZIP 만드는 중… ${k + 1}/${idx.length}`); progress(k / idx.length); });
-      if (g !== zipGen) { say("곡 목록이 바뀌어서 ZIP을 다시 만들어야 해요."); return; }
-      const name = `${st.name}_노래${idx.length}곡.zip`;
+      const files = st.segs.map((_, i) => ({ name: fileName(i), blob: st.src.cut(st.segs[i].start, st.segs[i].end).blob }));
+      const blob = await Media.zip(files, (k) => { ui.saveAll.textContent = `ZIP 만드는 중… ${k + 1}/${n}`; });
+      if (g !== zipGen) { toast("곡 목록이 바뀌어서 다시 눌러 주세요."); return; }
       st.zipUrl = URL.createObjectURL(blob);
-      ui.zipLink.href = st.zipUrl; ui.zipLink.download = name;
-      ui.zipLink.textContent = `ZIP 받기 (${mb(blob.size)})`; ui.zipLink.hidden = false;
-      if (!MOBILE) ui.zipLink.click();
-      say(MOBILE ? `ZIP이 준비됐어요(${idx.length}곡). 'ZIP 받기'를 눌러 저장하세요.` : `ZIP을 저장했어요(${idx.length}곡).`);
+      ui.zipLink.href = st.zipUrl; ui.zipLink.download = `${st.name} 노래 ${n}곡.zip`;
+      ui.zipLink.textContent = `ZIP 받기 (${mb(blob.size)})`;
+      if (MOBILE) {
+        ui.zipLink.hidden = false;
+        ui.saveHint.innerHTML = IOS ? "ZIP 받기를 누르면 파일 앱 › 다운로드에 저장돼요. ZIP을 한 번 누르면 풀려요." : "ZIP 받기를 눌러 저장하세요.";
+        ui.saveHint.hidden = false; say("ZIP이 준비됐어요. ZIP 받기를 누르세요.");
+      } else { ui.zipLink.click(); toast(`${n}곡을 ZIP으로 저장했어요`); }
     } catch (_) {
-      say("ZIP을 만들지 못했어요. 곡을 하나씩 저장해 주세요.");
-    } finally { progress(null); ui.zip.disabled = false; wake(false); }
+      toast("ZIP을 만들지 못했어요. 곡을 하나씩 저장해 주세요.");
+    } finally { ui.saveAll.textContent = label0; ui.saveAll.disabled = false; wake(false); }
   }
 
-  // Settings persistence (this device only).
+  // ---- settings (this device only) ----
+  const SENS = ["대사 아주 빼기", "대사 빼기", "대사 조금 빼기", "보통", "노래 조금 더 찾기", "노래 더 찾기", "노래 아주 많이 찾기"];
+  function sensText() { ui.sens.setAttribute("aria-valuetext", SENS[+ui.sens.value + 3]); }
+  for (const [elx, k] of [[ui.sens, "a2m.sens"], [ui.minSong, "a2m.minSong"], [ui.gap, "a2m.gap"]]) {
+    const v = store.get(k); if (v !== null && v !== "") elx.value = v;
+  }
+  sensText();
   ui.token.value = store.get("a2m.auddToken") || "";
   ui.autoName.checked = store.get("a2m.autoName") !== "0";
-  ui.token.addEventListener("change", () => {
-    store.set("a2m.auddToken", ui.token.value.trim());
-    st.rec.blocked = "";
-    recognizeAll();
-  });
+  function setToken(v) {
+    ui.token.value = ui.tokenInline.value = v.trim();
+    store.set("a2m.auddToken", ui.token.value);
+    ui.nameCard.hidden = true;
+    retryNames();
+  }
+  ui.token.addEventListener("change", () => setToken(ui.token.value));
+  ui.tokenSave.addEventListener("click", () => { if (ui.tokenInline.value.trim()) setToken(ui.tokenInline.value); else ui.tokenInline.focus(); });
+  ui.tokenInline.addEventListener("keydown", (e) => { if (e.key === "Enter") ui.tokenSave.click(); });
   ui.autoName.addEventListener("change", () => {
     store.set("a2m.autoName", ui.autoName.checked ? "1" : "0");
-    if (ui.autoName.checked) { recognizeAll(); return; }
+    if (ui.autoName.checked) { retryNames(); return; }
     st.rec.gen++;
-    st.segs.forEach((s) => { if (s.rec === "pending") s.rec = ""; });
-    if (st.src) renderList();
+    st.segs.forEach((s) => { if (s.rec === "pending") s.rec = ""; refreshRow(s); });
   });
-  if (/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints < 2) $("osMac").checked = true;
-  const SENS = ["아주 엄격", "엄격", "조금 엄격", "보통", "조금 너그럽게", "너그럽게", "아주 너그럽게"];
-  const sensText = () => ui.sens.setAttribute("aria-valuetext", SENS[+ui.sens.value + 3]);
-  sensText();
+  let debounce = 0;
+  [[ui.minSong, "a2m.minSong"], [ui.gap, "a2m.gap"], [ui.sens, "a2m.sens"]].forEach(([elx, k]) => elx.addEventListener("input", () => {
+    sensText(); store.set(k, elx.value);
+    clearTimeout(debounce); debounce = setTimeout(() => { if (st.feat) runDetect(); }, 300);
+  }));
 
-  ui.file.addEventListener("change", () => handleFile(ui.file.files[0]));
-  ["dragenter", "dragover"].forEach((ev) => ui.drop.addEventListener(ev, (e) => { e.preventDefault(); ui.drop.classList.add("over"); }));
-  ["dragleave", "drop"].forEach((ev) => ui.drop.addEventListener(ev, (e) => { e.preventDefault(); ui.drop.classList.remove("over"); }));
+  // ---- getting files in ----
+  $("iosCard").hidden = !IOS; $("macCard").hidden = !MAC;
+  $("dropSub").textContent = MOBILE ? "음성 메모 · m4a · mp3 · wav" : "또는 이 창에 끌어다 놓기 · ⌘V로 붙여넣기";
   const isAudio = (f) => /^(audio\/|video\/mp4)/.test(f.type) || /\.(m4a|qta|mp3|aac|wav|flac|ogg|opus)$/i.test(f.name);
-  ui.drop.addEventListener("drop", (e) => handleFile([...e.dataTransfer.files].find(isAudio) || e.dataTransfer.files[0]));
-  $("copyVmPath").addEventListener("click", async (e) => {
-    const b = e.currentTarget;
-    try { await navigator.clipboard.writeText($("vmPath").textContent); b.textContent = "복사했어요"; }
-    catch (_) { getSelection().selectAllChildren($("vmPath")); b.textContent = "선택했어요 · ⌘C"; }
-    setTimeout(() => { b.textContent = "경로 복사"; }, 2000);
+  ui.file.addEventListener("change", () => handleFile(ui.file.files[0]));
+  // Drop anywhere on the page (a stray drop would otherwise navigate away from the page).
+  let dragDepth = 0;
+  document.addEventListener("dragenter", (e) => { if ([...e.dataTransfer.types].includes("Files")) { dragDepth++; document.body.classList.add("dragging"); } });
+  document.addEventListener("dragleave", () => { if (--dragDepth <= 0) { dragDepth = 0; document.body.classList.remove("dragging"); } });
+  document.addEventListener("dragover", (e) => e.preventDefault());
+  document.addEventListener("drop", (e) => {
+    e.preventDefault(); dragDepth = 0; document.body.classList.remove("dragging");
+    const fs = [...e.dataTransfer.files];
+    if (fs.length) handleFile(fs.find(isAudio) || fs[0]);
   });
   // Paste a copied recording anywhere on the page (text pastes into fields are left alone).
   document.addEventListener("paste", (e) => {
@@ -1297,54 +1493,28 @@ const Media = (() => {
     const f = [...((e.clipboardData && e.clipboardData.files) || [])].find(isAudio);
     if (f) { e.preventDefault(); handleFile(f); }
   });
-  // Arrived from the "노래 가위로 보내기" Shortcut: point at the file it just saved.
+  $("copyVmPath").addEventListener("click", async (e) => {
+    const b = e.currentTarget;
+    try { await navigator.clipboard.writeText($("vmPath").textContent); b.textContent = "복사했어요"; }
+    catch (_) { getSelection().selectAllChildren($("vmPath")); b.textContent = "선택했어요 · ⌘C"; }
+    setTimeout(() => { b.textContent = "경로 복사"; }, 2000);
+  });
+  // Arrived from the "노래 가위로 보내기" Shortcut: one big button straight to the picker.
   const qs = new URLSearchParams(location.search);
   if (qs.get("from") === "shortcut") {
     const banner = $("fromShortcut"), name = qs.get("name");
     if (name) $("scName").textContent = name;
-    banner.hidden = false;
+    banner.hidden = false; $("iosCard").hidden = true;
     document.addEventListener("a2m:file", () => { banner.hidden = true; }, { once: true });
   }
-  let debounce = 0;
-  [ui.minSong, ui.gap, ui.sens].forEach((el) => el.addEventListener("input", () => { sensText(); clearTimeout(debounce); debounce = setTimeout(runDetect, 250); }));
-  ui.zip.addEventListener("click", saveZip);
+  $("pickSent").addEventListener("click", () => ui.file.click());
+  ui.cancel.addEventListener("click", cancelWork);
+  ui.retry.addEventListener("click", () => { show("start"); ui.file.click(); });
+  ui.again.addEventListener("click", () => { stopPlay(); ui.file.click(); });
+  ui.saveAll.addEventListener("click", saveAll);
   ui.stop.addEventListener("click", stopPlay);
-  ui.add.addEventListener("click", () => {
-    if (!st.src) return;
-    const dur = st.src.duration, start = Math.min(st.cursor, Math.max(0, dur - 1));
-    st.segs.push({ start, end: Math.min(dur, start + 180), on: true, name: "", nameEdited: false, rec: "" });
-    st.segs.sort((a, b) => a.start - b.start);
-    clearZipLink(); renderList(); draw();
-    say(`${fmt(start)}부터 3분짜리 구간을 추가했어요. 시작·끝을 고쳐 주세요.`);
-    recognizeAll();
-  });
-  function playFromCursor() {
-    if (!st.src) return;
-    const dur = st.src.duration;
-    // The decoded fallback renders WAV on the fly, so keep that clip short.
-    playFrom(st.cursor, Math.min(dur, st.cursor + (st.src.kind === "pcm" ? 120 : 600)), null);
-  }
-  ui.tl.addEventListener("click", (e) => {
-    if (!st.src) return;
-    const dur = st.src.duration, r = ui.tl.getBoundingClientRect();
-    st.cursor = Math.max(0, Math.min(dur, (e.clientX - r.left) / r.width * dur));
-    playFromCursor();
-  });
-  ui.tl.addEventListener("keydown", (e) => {
-    if (!st.src) return;
-    const dur = st.src.duration;
-    const step = { ArrowLeft: -5, ArrowDown: -5, ArrowRight: 5, ArrowUp: 5, PageDown: -30, PageUp: 30, Home: 0, End: dur }[e.key];
-    if (step !== undefined) {
-      e.preventDefault();
-      stopPlay();
-      st.cursor = e.key === "Home" ? 0 : e.key === "End" ? dur : Math.max(0, Math.min(dur, st.cursor + step));
-      draw();
-    } else if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      stopPlay();
-      playFromCursor();
-    }
-  });
+  ui.add.addEventListener("click", addSeg);
+  ui.trash.addEventListener("click", restoreLast);
   window.addEventListener("resize", draw);
   matchMedia("(prefers-color-scheme: dark)").addEventListener("change", draw);
 })();
