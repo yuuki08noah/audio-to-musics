@@ -144,8 +144,9 @@ button.row[aria-expanded=true] .chev{transform:rotate(225deg)}
 .segs .play svg,.segs .dl svg{width:14px;height:14px;fill:currentColor}
 li.playing .play{background:var(--red)}
 .rbtns{display:flex;gap:8px;align-items:center}
-.segs .dl{width:44px;height:44px;padding:0;border-radius:50%;background:var(--fill);color:var(--accent-text)}
-.segs .dl svg{width:16px;height:16px}
+.segs .dl{min-height:36px;padding:0 12px 0 10px;border-radius:999px;background:var(--accent-tint);color:var(--accent-text);font-size:14px;gap:4px;white-space:nowrap}
+.segs .dl svg{width:14px;height:14px}
+@media(max-width:380px){.segs .dl .dlt{display:none}.segs .dl{width:44px;height:44px;padding:0}}
 .pbar{grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:0 4px 12px 16px}
 .pbar[hidden]{display:none!important}
 .seekwrap{flex:1;min-width:0}
@@ -262,6 +263,7 @@ details.tune .cg{margin-top:6px}
 </div>
 <div class="toolbar">
 <button type="button" id="saveAllBtn" class="primary">모두 저장</button>
+<button type="button" id="eachBtn" hidden>곡마다 따로 다운로드</button>
 <a id="zipLink" class="btn" hidden></a>
 </div>
 <p class="gf" id="saveHint" hidden></p>
@@ -1216,7 +1218,7 @@ const FX = (() => {
     vStart: $("viewStart"), vWork: $("viewWork"), vResult: $("viewResult"),
     prog: $("prog"), workName: $("workName"), workPct: $("workPct"), workEta: $("workEta"), cancel: $("cancelBtn"),
     workError: $("workError"), workErrMsg: $("workErrMsg"), retry: $("retryBtn"), workTip: $("workTip"),
-    resTitle: $("resTitle"), resSub: $("resSub"), again: $("againBtn"), saveAll: $("saveAllBtn"), zipLink: $("zipLink"), saveHint: $("saveHint"),
+    resTitle: $("resTitle"), resSub: $("resSub"), again: $("againBtn"), saveAll: $("saveAllBtn"), each: $("eachBtn"), zipLink: $("zipLink"), saveHint: $("saveHint"),
     nameCard: $("nameCard"), tokenInline: $("tokenInline"), tokenSave: $("tokenSave"),
     tl: $("tl"), tlEnd: $("tlEnd"), stop: $("stopBtn"), segs: $("segs"), add: $("addBtn"), trash: $("trashBtn"), fmtNote: $("fmtNote"),
     tune: $("tune"), minSong: $("minSong"), gap: $("gap"), sens: $("sens"), autoName: $("autoName"), token: $("auddToken"),
@@ -1450,7 +1452,9 @@ const FX = (() => {
     const pending = st.segs.filter(fxPending).length;
     ui.saveAll.hidden = !n;
     ui.saveAll.disabled = !!pending;
-    ui.saveAll.textContent = pending ? `다듬는 중… (${n - pending}/${n}곡 끝)` : n > 1 ? `${n}곡 모두 저장` : "저장";
+    ui.saveAll.textContent = pending ? `다듬는 중… (${n - pending}/${n}곡 끝)` : n > 1 ? `${n}곡 한 번에 저장 (${MOBILE ? "공유·ZIP" : "ZIP"})` : "저장";
+    ui.each.hidden = n < 2;
+    ui.each.textContent = st.eachNext > 0 && st.eachNext < n ? `다음 곡 다운로드 (${st.eachNext + 1}/${n})` : "곡마다 따로 다운로드";
     ui.trash.hidden = !st.trash.length; ui.trash.textContent = `지운 곡 되돌리기 (${st.trash.length})`;
     const orig = st.src.kind === "pcm"
       ? `WAV로 저장돼요(${st.src.buffer.sampleRate / 1000}kHz${st.src.buffer.sampleRate < 44100 ? ", 긴 파일이라 낮춤" : ""}).`
@@ -1591,7 +1595,7 @@ const FX = (() => {
         el("span", { className: "idx", textContent: String(n), aria: { "aria-hidden": "true" } }),
         el("span", { className: "meta" }, ttl, len),
         el("span", { className: "chev", aria: { "aria-hidden": "true" } }));
-      const dl = el("button", { type: "button", className: "dl", innerHTML: ICON_DL, aria: { "aria-label": `${n}번 곡 다운로드` } });
+      const dl = el("button", { type: "button", className: "dl", innerHTML: `${ICON_DL}<span class="dlt">다운로드</span>`, aria: { "aria-label": `${n}번 곡 다운로드` } });
       dl.onclick = () => saveOne(i);
       const play = el("button", { type: "button", className: "play", innerHTML: ICON_PLAY, aria: { "aria-label": `${n}번 곡 재생` } });
       play.onclick = () => toggleSong(i);
@@ -1892,6 +1896,25 @@ const FX = (() => {
     download(f, f.name);
     toast(`${label(st.segs[i], i)} 저장 · ${WHERE}`);
   }
+  // Every song as its own file (no ZIP). Desktop: all at once. Phones only allow one download per tap,
+  // so each tap saves the next song and the button counts along.
+  function downloadEach() {
+    const n = st.segs.length;
+    if (!n) return;
+    if (!MOBILE) {
+      if (st.segs.some(fxPending)) { toast("아직 다듬는 중인 곡이 있어요. 끝나면 다시 눌러 주세요."); return; }
+      st.segs.forEach((_, i) => setTimeout(() => { const f = outFile(i); if (f) download(f, f.name); }, i * 500));
+      toast(`${n}곡을 한 곡씩 따로 저장해요 · ${WHERE}`);
+      return;
+    }
+    const i = (st.eachNext || 0) % n, f = outFile(i);
+    if (!f) { notReady(i); return; }
+    download(f, f.name);
+    st.eachNext = i + 1;
+    if (st.eachNext >= n) { st.eachNext = 0; toast(`${n}곡을 모두 받았어요 · ${WHERE}`); }
+    else toast(`${label(st.segs[i], i)} 저장 (${i + 1}/${n}) · 버튼을 눌러 다음 곡도 받으세요`);
+    updateHeader();
+  }
   function shareOne(i) {
     const f = outFile(i);
     if (!f) { notReady(i); return; }
@@ -1919,6 +1942,7 @@ const FX = (() => {
   let zipGen = 0;
   function clearZipLink() {
     zipGen++; // also invalidates a ZIP still being built
+    st.eachNext = 0; // the list changed: "다음 곡 다운로드" starts over
     if (st.zipUrl) URL.revokeObjectURL(st.zipUrl);
     st.zipUrl = ""; ui.zipLink.hidden = true; ui.zipLink.removeAttribute("href");
   }
@@ -2026,6 +2050,7 @@ const FX = (() => {
   ui.retry.addEventListener("click", () => { show("start"); ui.file.click(); });
   ui.again.addEventListener("click", () => { stopPlay(); ui.file.click(); });
   ui.saveAll.addEventListener("click", saveAll);
+  ui.each.addEventListener("click", downloadEach);
   ui.stop.addEventListener("click", stopPlay);
   ui.add.addEventListener("click", addSeg);
   ui.trash.addEventListener("click", restoreLast);
