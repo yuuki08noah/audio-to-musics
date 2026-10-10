@@ -141,8 +141,21 @@ button.row:focus-visible{outline:3px solid var(--focus);outline-offset:-3px}
 .chev{flex:none;width:8px;height:8px;border:solid var(--label2);border-width:0 2px 2px 0;transform:rotate(45deg);transition:transform .2s;opacity:.6;margin-right:4px}
 button.row[aria-expanded=true] .chev{transform:rotate(225deg)}
 .segs .play{width:44px;height:44px;padding:0;border-radius:50%;background:var(--accent-solid);color:#fff}
-.segs .play svg{width:14px;height:14px;fill:currentColor}
+.segs .play svg,.segs .dl svg{width:14px;height:14px;fill:currentColor}
 li.playing .play{background:var(--red)}
+.rbtns{display:flex;gap:8px;align-items:center}
+.segs .dl{width:44px;height:44px;padding:0;border-radius:50%;background:var(--fill);color:var(--accent-text)}
+.segs .dl svg{width:16px;height:16px}
+.pbar{grid-column:1/-1;display:flex;align-items:center;gap:8px;padding:0 4px 12px 16px}
+.pbar[hidden]{display:none!important}
+.seekwrap{flex:1;min-width:0}
+.seek{width:100%;margin:0;accent-color:var(--accent);min-height:28px}
+.ptime{display:flex;justify-content:space-between;font-size:12px;color:var(--label2);font-variant-numeric:tabular-nums}
+.fxbox{background:var(--fill);border-radius:10px;padding:2px 12px}
+.fxrow{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;font-size:15px;color:var(--label)}
+.fxrow+.fxrow{border-top:1px solid var(--sep)}
+.len .ok{color:var(--green)}
+#fxCard .cell{min-height:52px}
 li.playing .idx{background:var(--accent-solid);color:#fff}
 .edit{grid-column:1/-1;padding:4px 4px 16px 16px;display:flex;flex-direction:column;gap:12px}
 @media(min-width:520px){.edit{padding-left:58px}}
@@ -185,7 +198,7 @@ details.tune .cg{margin-top:6px}
 <p class="lede">긴 녹음에서 노래만 찾아 곡별로 잘라 드려요. 노래 이름도 붙여 드려요.</p>
 <div class="banner" id="fromShortcut" hidden>
 <strong>녹음을 받을 준비가 됐어요</strong>
-<span>방금 보낸 <b id="scName">녹음</b> 파일이 최근 항목 맨 위에 있어요.</span>
+<span>방금 보낸 <b id="scName">녹음</b>은 <b>최근 항목</b> 맨 위의 <b id="scFile">노래가위 녹음</b> 파일이에요.</span>
 <button type="button" class="primary" id="pickSent">보낸 녹음 고르기</button>
 </div>
 <label class="drop" id="drop">
@@ -257,6 +270,14 @@ details.tune .cg{margin-top:6px}
 <p>이름 없이도 ‘1번 곡’처럼 잘 저장돼요. 이름이 필요하면 <a href="https://dashboard.audd.io/" target="_blank" rel="noopener">AudD에 무료로 가입</a>(300곡까지 무료)하고 받은 토큰을 붙여넣으세요.</p>
 <div class="row"><input type="text" id="tokenInline" placeholder="토큰 붙여넣기" aria-label="AudD 토큰" autocomplete="off" autocapitalize="off" spellcheck="false"><button type="button" class="primary sm" id="tokenSave">확인</button></div>
 </div>
+<section class="group" id="fxCard" aria-labelledby="hFx" style="margin:20px 0 0">
+<h3 class="gh" id="hFx">음질 다듬기 · 모든 곡</h3>
+<div class="cg">
+<div class="cell"><label for="fxAllBoost">노래 소리 키우기</label><input type="checkbox" class="switch" id="fxAllBoost" role="switch"></div>
+<div class="cell"><label for="fxAllDenoise">잡음 줄이기</label><input type="checkbox" class="switch" id="fxAllDenoise" role="switch"></div>
+</div>
+<p class="gf">곡마다 따로 켜려면 곡을 눌러 바꾸세요. 켜면 저장할 때 소리를 다시 만들어요(조금 걸려요).</p>
+</section>
 <div class="tlwrap">
 <canvas id="tl" role="slider" tabindex="0" aria-label="전체 타임라인 (눌러서 그 지점부터 재생, 화살표 키로 이동)" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0" aria-valuetext="0:00"></canvas>
 <div class="legend"><span>0:00</span><button type="button" id="stopBtn" class="sm" hidden>정지</button><span id="tlEnd"></span></div>
@@ -328,6 +349,7 @@ const A2M = (() => {
   class FrameAnalyzer {
     constructor(ar) {
       this.fps = ar / HOP;
+      this.samples = 0;
       this.tail = new Float32Array(0);
       this.fft = makeFFT(N);
       this.re = new Float64Array(N); this.im = new Float64Array(N);
@@ -336,11 +358,13 @@ const A2M = (() => {
       this.kLo = Math.max(4, Math.ceil(100 / bin));
       this.kHi = Math.min(N / 2 - 4, Math.floor(4000 / bin));
       this.L = new Float64Array(N / 2 + 1); this.prevL = new Float64Array(N / 2 + 1);
+      this.prevPower = new Float64Array(N / 2 + 1);
       this.kB0 = Math.max(1, Math.ceil(40 / bin)); this.kB1 = Math.max(this.kB0, Math.floor(150 / bin));
       this.pk = new Uint8Array(N / 2 + 1); this.prevPk = new Uint8Array(N / 2 + 1);
-      this.e = []; this.zcr = []; this.flat = []; this.pers = []; this.flux = []; this.bflux = [];
+      this.e = []; this.zcr = []; this.flat = []; this.pers = []; this.flux = []; this.bflux = []; this.motion = [];
     }
     push(x) {
+      this.samples += x.length;
       let buf = x;
       if (this.tail.length) { buf = new Float32Array(this.tail.length + x.length); buf.set(this.tail); buf.set(x, this.tail.length); }
       let p = 0;
@@ -357,10 +381,15 @@ const A2M = (() => {
         prev = v; re[i] = v * win[i]; im[i] = 0;
       }
       this.fft(re, im);
-      let lsum = 0, psum = 0, mx = -Infinity;
+      let lsum = 0, psum = 0, mx = -Infinity, change = 0, power = 0, oldPower = 0;
       for (let k = Math.min(kB0, kLo - 3); k <= kHi + 3; k++) {
         const p = re[k] * re[k] + im[k] * im[k] + 1e-12, l = Math.log(p);
         L[k] = l;
+        if (k >= kB0 && k <= kHi) {
+          const prev = this.prevPower[k];
+          change += Math.max(0, p - prev); power += p; oldPower += prev;
+          this.prevPower[k] = p;
+        }
         if (k >= kLo && k <= kHi) { lsum += l; psum += p; if (l > mx) mx = l; }
       }
       const nb = kHi - kLo + 1;
@@ -389,19 +418,21 @@ const A2M = (() => {
       this.pers.push(cnt ? hit / cnt : 0);
       this.flux.push(fx / nb);
       this.bflux.push(bfx / (kB1 - kB0 + 1));
+      // Unlike log flux, this cannot amplify inaudible FFT leakage into a strong beat.
+      this.motion.push(change / Math.max(power, oldPower, 1e-12));
     }
     result() {
       const f32 = (a) => Float32Array.from(a);
-      return { fps: this.fps, e: f32(this.e), zcr: f32(this.zcr), flat: f32(this.flat), pers: f32(this.pers), flux: f32(this.flux), bflux: f32(this.bflux) };
+      return { fps: this.fps, duration: this.samples / (this.fps * HOP), e: f32(this.e), zcr: f32(this.zcr), flat: f32(this.flat), pers: f32(this.pers), flux: f32(this.flux), bflux: f32(this.bflux), motion: f32(this.motion) };
     }
   }
 
   const DEFAULTS = { minSong: 60, gap: 2, join: 5, sens: 0, silenceDb: 30, smooth: 9, switchCost: 5 };
   const clamp = (x) => x < -1 ? -1 : x > 1 ? 1 : x;
 
-  function percentile(arr, q) {
-    const stride = Math.max(1, Math.floor(arr.length / 20000)), s = [];
-    for (let i = 0; i < arr.length; i += stride) s.push(arr[i]);
+  function percentile(arr, q, a = 0, b = arr.length) {
+    const stride = Math.max(1, Math.floor((b - a) / 20000)), s = [];
+    for (let i = a; i < b; i += stride) s.push(arr[i]);
     s.sort((a, b) => a - b);
     return s.length ? s[Math.min(s.length - 1, Math.floor(q * s.length))] : 0;
   }
@@ -424,9 +455,9 @@ const A2M = (() => {
 
   // Per-second stats: 2 s window for level/ZCR/spectral stats, 6 s window for beat periodicity.
   function secondStats(f, quiet) {
-    const { fps, e, zcr, flat, pers, flux, bflux } = f, n = e.length, nSec = Math.ceil(n / fps);
+    const { fps, e, zcr, flat, pers, flux, bflux, motion } = f, n = e.length, nSec = Math.ceil(n / fps);
     const mk = () => new Float32Array(nSec);
-    const st = { ler: mk(), hz: mk(), flat: mk(), pers: mk(), dip: mk(), rhy: mk(), brhy: mk(), silent: new Uint8Array(nSec) };
+    const st = { ler: mk(), hz: mk(), flat: mk(), pers: mk(), dip: mk(), rhy: mk(), brhy: mk(), motion: mk(), silent: new Uint8Array(nSec) };
     const lagLo = Math.round(0.3 * fps), lagHi = Math.round(1.0 * fps), db = [];
     for (let s = 0; s < nSec; s++) {
       const a = Math.max(0, Math.round((s - 0.5) * fps)), b = Math.min(n, Math.round((s + 1.5) * fps));
@@ -450,6 +481,7 @@ const A2M = (() => {
       const ra = Math.max(0, Math.round((s - 2.5) * fps)), rb = Math.min(n, Math.round((s + 3.5) * fps));
       st.rhy[s] = periodicity(flux, ra, rb, lagLo, lagHi);
       st.brhy[s] = periodicity(bflux, ra, rb, lagLo, lagHi);
+      for (let i = ra; i < rb; i++) st.motion[s] = Math.max(st.motion[s], motion[i]);
     }
     return st;
   }
@@ -464,6 +496,8 @@ const A2M = (() => {
   // Flatness only penalises broadband noise (applause/crowd ≈ .5); it never rewards.
   function secondScore(st, s) {
     if (st.silent[s]) return -0.5;
+    // A steady hum/tone can have highly periodic log-flux leakage without audible onsets.
+    if (st.motion[s] < 0.02) return -0.5;
     const rhy = clamp((Math.max(st.rhy[s], st.brhy[s]) - 0.23) / 0.06);
     const ler = clamp((0.14 - st.ler[s]) / 0.08);
     const dip = clamp((8 - st.dip[s]) / 3);
@@ -475,17 +509,35 @@ const A2M = (() => {
 
   function detect(f, opts) {
     const o = Object.assign({}, DEFAULTS, opts);
-    const { fps, e } = f, n = e.length;
+    const { fps, e, duration } = f, n = e.length;
     const db = new Float32Array(n);
     for (let i = 0; i < n; i++) db[i] = 20 * Math.log10(e[i] + 1e-9);
     // "Quiet" = 30 dB under loud parts, raised only when the recording's hiss floor sits higher.
     // p1 (not p5): mostly dialogue/music files have little true silence.
     const ref = percentile(db, 0.95), floor = percentile(db, 0.01);
-    const qThr = Math.min(ref - 12, Math.max(ref - o.silenceDb, floor + 6));
-    const quiet = new Uint8Array(n);
-    for (let i = 0; i < n; i++) quiet[i] = db[i] < qThr ? 1 : 0;
+    const threshold = (r, f) => Math.min(r - 12, Math.max(r - o.silenceDb, f + 6));
+    const qThr = threshold(ref, floor), quiet = new Uint8Array(n);
+    // A loud passage must not hide a quieter song elsewhere. Re-estimate the gate every
+    // second over 5 s of nearby audio; cap it at the global gate to preserve quiet gaps.
+    for (let s = 0; s < Math.ceil(n / fps); s++) {
+      const a = Math.max(0, Math.round((s - 2) * fps)), b = Math.min(n, Math.round((s + 3) * fps));
+      const local = Math.min(qThr, threshold(percentile(db, 0.95, a, b), percentile(db, 0.01, a, b)));
+      for (let i = Math.round(s * fps); i < Math.min(n, Math.round((s + 1) * fps)); i++) {
+        quiet[i] = e[i] === 0 || db[i] < local ? 1 : 0;
+      }
+    }
 
     const st = secondStats(f, quiet), nSec = st.silent.length;
+    const gapF = Math.max(1, Math.round(o.gap * fps)), cuts = new Uint8Array(nSec);
+    // Quiet gaps already split songs below. Also decouple the state paths there, so a
+    // later song cannot pull preceding dialogue into music merely to avoid a switch.
+    for (let i = 0; i < n;) {
+      if (!quiet[i]) { i++; continue; }
+      let j = i + 1;
+      while (j < n && quiet[j]) j++;
+      if (j - i >= gapF) cuts[Math.min(nSec - 1, Math.round((i + j) / (2 * fps)))] = 1;
+      i = j;
+    }
     const raw = new Float32Array(nSec), score = new Float32Array(nSec);
     for (let s = 0; s < nSec; s++) raw[s] = secondScore(st, s);
     const h = Math.floor(o.smooth / 2); // display-only smoothing
@@ -497,9 +549,10 @@ const A2M = (() => {
 
     // Two-state Viterbi (0 = dialogue/other, 1 = music): music earns +m per second, dialogue −m,
     // each switch costs `switchCost`. Sparse song verses stay inside the song; real dialogue breaks it.
-    const bias = 0.07 * o.sens, P = o.switchCost, back = new Uint8Array(nSec * 2);
+    const bias = 0.07 * o.sens, back = new Uint8Array(nSec * 2);
     let v0 = 0, v1 = 0;
     for (let s = 0; s < nSec; s++) {
+      const P = cuts[s] ? 0 : o.switchCost;
       const m = (st.silent[s] ? -0.2 : raw[s]) + bias;
       const s0 = v1 - P > v0, s1 = v0 - P > v1;
       const n0 = (s0 ? v1 - P : v0) - m, n1 = (s1 ? v0 - P : v1) + m;
@@ -525,7 +578,7 @@ const A2M = (() => {
     // Frame level: split runs at quiet gaps and trim quiet edges. Fragments (< 30 s, or minSong if
     // smaller) are glued to the nearest neighbour across a short pause (songs have breaks), so a
     // song with an internal pause stays whole while two full songs never merge.
-    const gapF = Math.max(1, Math.round(o.gap * fps)), joinF = o.join * fps, minF = o.minSong * fps, pieces = [];
+    const joinF = o.join * fps, pieces = [];
     const fragF = Math.min(o.minSong, 30) * fps;
     const piece = (a, b) => {
       while (a < b && quiet[a]) a++;
@@ -554,14 +607,16 @@ const A2M = (() => {
     }
     // Keep fade-ins/outs: grow each song through adjacent quiet frames that are still above the
     // recording's noise floor (≤ 12 s), never into a neighbouring song.
-    const kept = pieces.filter(([a, b]) => b - a >= minF), deep = floor + 6, fadeF = 12 * fps, segments = [];
+    // Frames overlap by one hop; the last frame also represents the remaining input tail.
+    const frameEnd = (b) => b === n ? duration : Math.min(duration, (b + 1) / fps);
+    const kept = pieces.filter(([a, b]) => frameEnd(b) - a / fps >= o.minSong), deep = floor + 6, fadeF = 12 * fps, segments = [];
     kept.forEach((p, i) => {
       const lo = i ? kept[i - 1][1] : 0, hi = i < kept.length - 1 ? kept[i + 1][0] : n;
       let [a, b] = p;
       while (a > lo && p[0] - a < fadeF && quiet[a - 1] && db[a - 1] > deep) a--;
       while (b < hi && b - p[1] < fadeF && quiet[b] && db[b] > deep) b++;
       p[0] = a; p[1] = b;
-      segments.push({ start: a / fps, end: Math.min(n, b + 1) / fps });
+      segments.push({ start: a / fps, end: frameEnd(b) });
     });
     return { segments, score };
   }
@@ -602,9 +657,9 @@ const Media = (() => {
     parts.push(file.slice(a, b));
     return parts;
   }
-  function frameSource(kind, ext, mime, file, off, size, t, head) {
+  function frameSource(kind, ext, mime, file, off, size, t, head, sampleRate) {
     return {
-      kind, ext, mime, duration: t[t.length - 1], preroll: 0.1,
+      kind, ext, mime, duration: t[t.length - 1], preroll: 0.1, sampleRate,
       cut(t0, t1) {
         const [i0, i1] = frameRange(t, t0, t1);
         return { blob: new Blob([...head(i0, i1), ...frameBytes(file, off, size, i0, i1)], { type: mime }), t0: t[i0], t1: t[i1] };
@@ -712,7 +767,7 @@ const Media = (() => {
       new DataView(moovOut.buffer).setUint32(moovOut.length - 4, ftyp.length + moovOut.length + 8);
       return [ftyp, moovOut, be(bytes + 8), enc.encode("mdat")];
     };
-    return frameSource("m4a", "m4a", "audio/mp4", file, off, size, t, head);
+    return frameSource("m4a", "m4a", "audio/mp4", file, off, size, t, head, ts); // audio mdhd timescale = sample rate
   }
 
   // ---- MP3 ----
@@ -760,7 +815,7 @@ const Media = (() => {
     const f0 = await read(file, off[0], off[0] + Math.min(size[0], 64)), tag = new TextDecoder("latin1").decode(f0);
     if (/Xing|Info|VBRI/.test(tag)) { off.shift(); size.shift(); }
     const t = Float64Array.from({ length: off.length + 1 }, (_, i) => i * spf / sr);
-    return frameSource("mp3", "mp3", "audio/mpeg", file, off, size, t, () => []);
+    return frameSource("mp3", "mp3", "audio/mpeg", file, off, size, t, () => [], sr);
   }
 
   // ---- WAV ----
@@ -777,7 +832,7 @@ const Media = (() => {
     if (!sr || !ba) return null;
     const frames = Math.floor(dataLen / ba), duration = frames / sr;
     return {
-      kind: "wav", ext: "wav", mime: "audio/wav", duration, preroll: 0,
+      kind: "wav", ext: "wav", mime: "audio/wav", duration, preroll: 0, sampleRate: sr,
       cut(t0, t1) {
         const a = Math.max(0, Math.min(frames - 1, Math.floor(t0 * sr))), b = Math.max(a + 1, Math.min(frames, Math.ceil(t1 * sr)));
         const hdr = new Uint8Array(12), hd = new DataView(hdr.buffer), dh = new Uint8Array(8), dd = new DataView(dh.buffer);
@@ -791,7 +846,7 @@ const Media = (() => {
   // ---- Fallback: decoded AudioBuffer → 16-bit WAV with 20 ms fades so cuts don't click ----
   function pcmSource(buf) {
     return {
-      kind: "pcm", ext: "wav", mime: "audio/wav", duration: buf.duration, preroll: 0, buffer: buf,
+      kind: "pcm", ext: "wav", mime: "audio/wav", duration: buf.duration, preroll: 0, buffer: buf, sampleRate: buf.sampleRate,
       cut(t0, t1) {
         const sr = buf.sampleRate, ch = buf.numberOfChannels;
         const a = Math.max(0, Math.floor(t0 * sr)), b = Math.min(buf.length, Math.ceil(t1 * sr)), n = Math.max(0, b - a);
@@ -873,6 +928,285 @@ const Media = (() => {
 })();
 </script>
 
+<script id="a2m-fx">
+const FX = (() => {
+  const yieldUI = () => new Promise(resolve => setTimeout(resolve, 0));
+  const db = value => Math.pow(10, value / 20);
+  const aacConfig = (sampleRate, count) => ({ codec: 'mp4a.40.2', sampleRate,
+    numberOfChannels: count, bitrate: count === 1 ? 96000 : 160000 });
+  function validate(channels, sampleRate) {
+    if (!channels.length || channels.length > 65535 || !Number.isInteger(sampleRate) || sampleRate <= 0 || sampleRate > 0xffffffff ||
+        channels.some(c => !(c instanceof Float32Array) || c.length !== channels[0].length))
+      throw new TypeError('Expected equally sized Float32Array channels and a valid audio sample rate');
+  }
+  async function supported(config) {
+    if (typeof AudioEncoder === 'undefined' || typeof AudioData === 'undefined') return false;
+    try { return (await AudioEncoder.isConfigSupported(config)).supported; } catch (_) { return false; }
+  }
+  async function canEncodeAac() { return supported(aacConfig(44100, 2)); }
+
+  // A reusable radix-2 FFT: no allocations in the per-frame transform.
+  function fftPlan(size) {
+    const reverse = new Uint16Array(size), cosine = new Float64Array(size / 2), sine = new Float64Array(size / 2);
+    for (let i = 0; i < size; i++) {
+      let x = i, r = 0;
+      for (let bit = 1; bit < size; bit <<= 1) { r = (r << 1) | (x & 1); x >>= 1; }
+      reverse[i] = r;
+    }
+    for (let i = 0; i < size / 2; i++) { cosine[i] = Math.cos(2 * Math.PI * i / size); sine[i] = Math.sin(2 * Math.PI * i / size); }
+    return (real, imag, inverse) => {
+      for (let i = 0; i < size; i++) {
+        const j = reverse[i];
+        if (j > i) { const r = real[i], m = imag[i]; real[i] = real[j]; imag[i] = imag[j]; real[j] = r; imag[j] = m; }
+      }
+      for (let width = 2; width <= size; width <<= 1) {
+        const half = width >> 1, stride = size / width;
+        for (let base = 0; base < size; base += width) {
+          for (let j = 0; j < half; j++) {
+            const k = j * stride, wr = cosine[k], wi = inverse ? sine[k] : -sine[k];
+            const a = base + j, b = a + half;
+            const r = real[b] * wr - imag[b] * wi, m = real[b] * wi + imag[b] * wr;
+            real[b] = real[a] - r; imag[b] = imag[a] - m; real[a] += r; imag[a] += m;
+          }
+        }
+      }
+      if (inverse) for (let i = 0; i < size; i++) { real[i] /= size; imag[i] /= size; }
+    };
+  }
+
+  async function render({ channels, sampleRate }, { boost = false, denoise = false } = {}, onProgress) {
+    validate(channels, sampleRate);
+    const length = channels[0].length;
+    let lastYield = performance.now(), progress = 0;
+    const report = p => { progress = Math.max(progress, Math.min(1, p)); if (onProgress) onProgress(progress); };
+    const pause = async p => { report(p); await yieldUI(); lastYield = performance.now(); };
+    await pause(0);
+    let output = [];
+    for (let c = 0; c < channels.length; c++) {
+      const copy = new Float32Array(length);
+      for (let i = 0; i < length; i += 65536) {
+        copy.set(channels[c].subarray(i, i + 65536), i);
+        if (performance.now() - lastYield > 25) await pause(0);
+      }
+      output.push(copy);
+    }
+    if (denoise && length) {
+      const size = 1024, hop = size / 2, bins = hop + 1, fft = fftPlan(size);
+      const win = new Float64Array(size), norm = new Float64Array(hop);
+      for (let i = 0; i < size; i++) win[i] = 0.5 - 0.5 * Math.cos(2 * Math.PI * i / size);
+      for (let i = 0; i < hop; i++) norm[i] = win[i] * win[i] + win[i + hop] * win[i + hop];
+      const real = new Float64Array(size), imag = new Float64Array(size);
+      const frames = Math.ceil(length / hop) + 1;
+      const profileFrames = Math.min(512, frames);
+      const magnitudes = new Float32Array(bins * profileFrames), sampleBin = new Float32Array(profileFrames);
+      const frameEnergy = new Float32Array(profileFrames), quietBin = new Float32Array(profileFrames);
+      const profile = new Float64Array(bins), gain = new Float64Array(bins), temporal = new Float64Array(bins);
+      for (let c = 0; c < channels.length; c++) {
+        const source = output[c], clean = new Float32Array(length);
+        // Smooth 70 Hz Butterworth high-pass: flatter music passband than a first-order filter.
+        const omega = 2 * Math.PI * Math.min(70, sampleRate * 0.1) / sampleRate;
+        const cosine = Math.cos(omega), alpha = Math.sin(omega) / Math.SQRT2, a0 = 1 + alpha;
+        const b0 = (1 + cosine) / (2 * a0), b1 = -(1 + cosine) / a0, a1 = -2 * cosine / a0, a2 = (1 - alpha) / a0;
+        let x1 = source[0], x2 = source[0], y1 = 0, y2 = 0;
+        for (let i = 0; i < length; i++) {
+          const x = source[i], y = b0 * x + b1 * x1 + b0 * x2 - a1 * y1 - a2 * y2;
+          x2 = x1; x1 = x; y2 = y1; y1 = y; source[i] = y;
+          if ((i & 65535) === 0 && performance.now() - lastYield > 25) await pause(0.02 + 0.78 * c / channels.length);
+        }
+        const loadFrame = start => {
+          for (let j = 0; j < size; j++) { const i = start + j; real[j] = i >= 0 && i < length ? source[i] * win[j] : 0; imag[j] = 0; }
+          fft(real, imag, false);
+        };
+        // Bounded profile storage. Uniformly spaced frames cover the whole clip, not just its intro.
+        for (let f = 0; f < profileFrames; f++) {
+          const frame = profileFrames === 1 ? 0 : Math.round(f * (frames - 1) / (profileFrames - 1));
+          loadFrame((frame - 1) * hop);
+          let energy = 0;
+          for (let k = 0; k < bins; k++) {
+            const magnitude = Math.hypot(real[k], imag[k]); magnitudes[k * profileFrames + f] = magnitude; energy += magnitude * magnitude;
+          }
+          frameEnergy[f] = energy;
+          if ((f & 7) === 0 && performance.now() - lastYield > 25) await pause(0.02 + 0.78 * (c + 0.1 * f / profileFrames) / channels.length);
+        }
+        const quietThreshold = frameEnergy.slice().sort()[Math.floor((profileFrames - 1) * 0.1)];
+        for (let k = 0; k < bins; k++) {
+          sampleBin.set(magnitudes.subarray(k * profileFrames, (k + 1) * profileFrames)); sampleBin.sort();
+          // Conservative low-percentile estimate; a modest correction tolerates music in most frames.
+          profile[k] = sampleBin[Math.floor((profileFrames - 1) * 0.05)] * 3.5;
+          // Quiet-frame cap prevents sustained bass/notes from being mistaken for room noise.
+          let quietCount = 0;
+          for (let f = 0; f < profileFrames; f++) if (frameEnergy[f] <= quietThreshold) quietBin[quietCount++] = magnitudes[k * profileFrames + f];
+          const quietValues = quietBin.subarray(0, quietCount); quietValues.sort();
+          profile[k] = Math.min(profile[k], quietValues[Math.floor((quietCount - 1) * 0.5)] * 1.3);
+          if ((k & 31) === 0 && performance.now() - lastYield > 25) await pause(0.02 + 0.78 * (c + 0.1) / channels.length);
+        }
+        temporal.fill(0.1);
+        for (let f = 0; f < frames; f++) {
+          const start = (f - 1) * hop;
+          loadFrame(start);
+          for (let k = 0; k < bins; k++) {
+            const power = real[k] * real[k] + imag[k] * imag[k];
+            const noisePower = profile[k] * profile[k], snr = power / Math.max(1e-30, noisePower);
+            // Over-subtract noise-dominated bins; preserve notes comfortably above the profile.
+            const subtraction = 3 - Math.min(2, Math.max(0, (snr - 8) / 6));
+            const target = Math.sqrt(Math.max(0.01, 1 - subtraction * noisePower / Math.max(1e-30, power)));
+            // Fast opening protects transients, slow closing avoids isolated musical-noise bursts.
+            temporal[k] += (target > temporal[k] ? 0.8 : 0.35) * (target - temporal[k]);
+          }
+          for (let k = 0; k < bins; k++) gain[k] = (temporal[Math.max(0, k - 1)] + 2 * temporal[k] + temporal[Math.min(hop, k + 1)]) * 0.25;
+          for (let k = 0; k < bins; k++) {
+            real[k] *= gain[k]; imag[k] *= gain[k];
+            if (k > 0 && k < hop) { real[size - k] *= gain[k]; imag[size - k] *= gain[k]; }
+          }
+          fft(real, imag, true);
+          for (let j = Math.max(0, -start); j < Math.min(size, length - start); j++) clean[start + j] += real[j] * win[j];
+          if ((f & 7) === 0 && performance.now() - lastYield > 25) await pause(0.02 + 0.78 * (c + 0.12 + 0.88 * f / frames) / channels.length);
+        }
+        for (let i = 0; i < length; i++) {
+          clean[i] /= norm[i % hop];
+          if ((i & 65535) === 0 && performance.now() - lastYield > 25) await pause(0.02 + 0.78 * (c + 1) / channels.length);
+        }
+        output[c] = clean;
+      }
+    }
+    if (boost && length) {
+      const base = denoise ? 0.8 : 0;
+      const block = Math.max(1, Math.round(sampleRate * 0.4)), energies = new Float64Array(Math.ceil(length / block));
+      let maxEnergy = 0;
+      for (let b = 0; b < energies.length; b++) {
+        let energy = 0; const start = b * block, end = Math.min(length, start + block);
+        for (let c = 0; c < output.length; c++) for (let i = start; i < end; i++) energy += output[c][i] * output[c][i];
+        energies[b] = energy / ((end - start) * output.length); maxEnergy = Math.max(maxEnergy, energies[b]);
+        if (performance.now() - lastYield > 25) await pause(base + (1 - base) * 0.15 * b / energies.length);
+      }
+      let sum = 0, count = 0;
+      for (let b = 0; b < energies.length; b++) if (energies[b] > Math.max(1e-6, maxEnergy * 0.01)) { sum += energies[b]; count++; }
+      const rms = count ? Math.sqrt(sum / count) : 0;
+      // -18 dBFS gated RMS approximates streaming loudness for music; this is not BS.1770 LUFS.
+      const amplification = rms ? Math.min(db(24), Math.max(1, db(-18) / rms)) : 1;
+      const ceiling = db(-1), envelope = new Float32Array(length);
+      // Backward 1 ms attack anticipates peaks over ~5 ms; linked-channel 100 ms release.
+      // This offline look-ahead adds no delay or trailing samples to the returned audio.
+      const attack = Math.exp(-1 / (sampleRate * 0.001)), release = Math.exp(-1 / (sampleRate * 0.1));
+      let peak = 0;
+      for (let i = length - 1; i >= 0; i--) {
+        let instant = 0; for (let c = 0; c < output.length; c++) instant = Math.max(instant, Math.abs(output[c][i]) * amplification);
+        peak = Math.max(instant, peak * attack); envelope[i] = peak;
+        if ((i & 65535) === 0 && performance.now() - lastYield > 25) await pause(base + (1 - base) * (0.15 + 0.4 * (1 - i / length)));
+      }
+      peak = 0;
+      for (let i = 0; i < length; i++) {
+        peak = Math.max(envelope[i], peak * release);
+        const multiplier = amplification * Math.min(1, ceiling / Math.max(peak, 1e-30));
+        for (let c = 0; c < output.length; c++) output[c][i] *= multiplier;
+        if ((i & 65535) === 0 && performance.now() - lastYield > 25) await pause(base + (1 - base) * (0.55 + 0.44 * i / length));
+      }
+    }
+    report(1); return output;
+  }
+
+  function wav(channels, sampleRate) {
+    const length = channels[0].length, count = channels.length, bytes = length * count * 2;
+    if (bytes > 0xffffffff - 36) throw new RangeError('Audio is too large for a PCM WAV file');
+    const data = new ArrayBuffer(44 + bytes), view = new DataView(data);
+    const text = (offset, value) => { for (let i = 0; i < value.length; i++) view.setUint8(offset + i, value.charCodeAt(i)); };
+    text(0, 'RIFF'); view.setUint32(4, 36 + bytes, true); text(8, 'WAVE'); text(12, 'fmt ');
+    view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, count, true);
+    view.setUint32(24, sampleRate, true); view.setUint32(28, sampleRate * count * 2, true);
+    view.setUint16(32, count * 2, true); view.setUint16(34, 16, true); text(36, 'data'); view.setUint32(40, bytes, true);
+    let offset = 44;
+    for (let i = 0; i < length; i++) for (let c = 0; c < count; c++) {
+      const x = Math.max(-1, Math.min(1, channels[c][i])); view.setInt16(offset, Math.round(x < 0 ? x * 32768 : x * 32767), true); offset += 2;
+    }
+    return { blob: new Blob([data], { type: 'audio/wav' }), ext: 'wav', mime: 'audio/wav' };
+  }
+
+  // ISO BMFF single audio track, one contiguous chunk; offsets are relative to file start.
+  function m4a(packets, description, channels, rate, inputLength, priming) {
+    const cat = (...parts) => { const result = new Uint8Array(parts.reduce((n, p) => n + p.length, 0)); let at = 0; for (const p of parts) { result.set(p, at); at += p.length; } return result; };
+    const str = text => Uint8Array.from(text, c => c.charCodeAt(0));
+    const u32 = value => new Uint8Array([(value >>> 24) & 255, (value >>> 16) & 255, (value >>> 8) & 255, value & 255]);
+    const u16 = value => new Uint8Array([(value >>> 8) & 255, value & 255]);
+    const box = (type, ...parts) => { const body = cat(...parts); return cat(u32(body.length + 8), str(type), body); };
+    const full = (type, flags, ...parts) => box(type, u32(flags), ...parts);
+    const descriptor = (tag, body) => {
+      let length = body.length; const bytes = [length & 127]; while ((length >>= 7)) bytes.unshift((length & 127) | 128);
+      return cat(new Uint8Array([tag, ...bytes]), body);
+    };
+    const identity = cat(u32(0x10000), u32(0), u32(0), u32(0), u32(0x10000), u32(0), u32(0), u32(0), u32(0x40000000));
+    const duration = packets.length * 1024, movieDuration = Math.round(inputLength * 1000 / rate);
+    const sizes = new Uint8Array(packets.length * 4), sizeView = new DataView(sizes.buffer);
+    for (let i = 0; i < packets.length; i++) sizeView.setUint32(i * 4, packets[i].data.length);
+    const ftyp = box('ftyp', str('M4A '), u32(0), str('M4A '), str('isom'), str('mp42'));
+    const esds = full('esds', 0, descriptor(3, cat(u16(1), new Uint8Array([0]),
+      descriptor(4, cat(new Uint8Array([0x40, 0x15, 0, 0, 0]), u32(channels === 1 ? 96000 : 160000), u32(channels === 1 ? 96000 : 160000), descriptor(5, description))),
+      descriptor(6, new Uint8Array([2])))));
+    // Above 65535 Hz, use zero in the legacy 16.16 field; AudioSpecificConfig carries the true rate.
+    const entry = box('mp4a', new Uint8Array(6), u16(1), new Uint8Array(8), u16(channels), u16(16), u16(0), u16(0), u32(rate <= 65535 ? rate * 65536 : 0), esds);
+    const makeMoov = offset => box('moov',
+      full('mvhd', 0, u32(0), u32(0), u32(1000), u32(movieDuration), u32(0x10000), u16(0x100), new Uint8Array(10), identity, new Uint8Array(24), u32(2)),
+      box('trak', full('tkhd', 7, u32(0), u32(0), u32(1), u32(0), u32(movieDuration), new Uint8Array(8), u16(0), u16(0), u16(0x100), u16(0), identity, u32(0), u32(0)),
+        // Encoder negative timestamps identify priming. Trim both priming and the padded tail.
+        box('edts', full('elst', 0, u32(1), u32(movieDuration), u32(priming), u16(1), u16(0))),
+        box('mdia', full('mdhd', 0, u32(0), u32(0), u32(rate), u32(duration), u16(0x55c4), u16(0)),
+          full('hdlr', 0, u32(0), str('soun'), new Uint8Array(12), str('SoundHandler\0')),
+          box('minf', full('smhd', 0, u16(0), u16(0)),
+            box('dinf', full('dref', 0, u32(1), full('url ', 1))),
+            box('stbl', full('stsd', 0, u32(1), entry), full('stts', 0, u32(1), u32(packets.length), u32(1024)),
+              full('stsc', 0, u32(1), u32(1), u32(packets.length), u32(1)),
+              full('stsz', 0, u32(0), u32(packets.length), sizes),
+              full('stco', 0, u32(1), u32(offset)))))));
+    const moov = makeMoov(0), finalMoov = makeMoov(ftyp.length + moov.length + 8);
+    const total = packets.reduce((n, p) => n + p.data.length, 0);
+    if (total + ftyp.length + finalMoov.length + 8 > 0xffffffff) throw new RangeError('Audio is too large for this M4A container');
+    return { blob: new Blob([ftyp, finalMoov, u32(total + 8), str('mdat'), ...packets.map(p => p.data)], { type: 'audio/mp4' }), ext: 'm4a', mime: 'audio/mp4' };
+  }
+
+  async function encode(channels, sampleRate) {
+    validate(channels, sampleRate);
+    const config = aacConfig(sampleRate, channels.length), length = channels[0].length;
+    if (!length || !(await supported(config))) return wav(channels, sampleRate);
+    const packets = []; let description, failure, firstTimestamp;
+    const encoder = new AudioEncoder({
+      output(chunk, metadata) {
+        const data = new Uint8Array(chunk.byteLength); chunk.copyTo(data);
+        packets.push({ data });
+        if (firstTimestamp === undefined) firstTimestamp = chunk.timestamp;
+        if (metadata && metadata.decoderConfig && metadata.decoderConfig.description) {
+          const asc = metadata.decoderConfig.description;
+          description = ArrayBuffer.isView(asc)
+            ? new Uint8Array(asc.buffer, asc.byteOffset, asc.byteLength).slice()
+            : new Uint8Array(asc.slice(0));
+        }
+      }, error(error) { failure = error; }
+    });
+    try {
+      encoder.configure(config);
+      const block = 4096, scratch = new Float32Array(block * channels.length);
+      let lastYield = performance.now();
+      for (let start = 0; start < length; start += block) {
+        if (failure) throw failure;
+        const frames = Math.min(block, length - start);
+        for (let c = 0; c < channels.length; c++) scratch.set(channels[c].subarray(start, start + frames), c * frames);
+        const audio = new AudioData({ format: 'f32-planar', sampleRate, numberOfChannels: channels.length,
+          numberOfFrames: frames, timestamp: Math.round(start * 1e6 / sampleRate), data: scratch.subarray(0, frames * channels.length) });
+        try { encoder.encode(audio); } finally { audio.close(); }
+        // Do not flush for backpressure: some AAC encoders insert fresh priming at every flush.
+        while (encoder.encodeQueueSize >= 12) { await yieldUI(); if (failure) throw failure; }
+        if (performance.now() - lastYield > 25) { await yieldUI(); lastYield = performance.now(); }
+      }
+      await encoder.flush(); if (failure) throw failure;
+      if (!description || !packets.length) throw new Error('AAC encoder did not provide AudioSpecificConfig or packets');
+      const priming = Math.max(0, Math.round(-firstTimestamp * sampleRate / 1e6));
+      // Some platforms start at timestamp zero despite internal AAC delay: their unreported
+      // priming cannot be inferred safely. elst still limits playback to the original duration.
+      return m4a(packets, description, channels.length, sampleRate, length, priming);
+    } finally { if (encoder.state !== 'closed') encoder.close(); }
+  }
+  return { render, encode, canEncodeAac };
+})();
+</script>
+
 <script>
 "use strict";
 (() => {
@@ -886,7 +1220,7 @@ const Media = (() => {
     nameCard: $("nameCard"), tokenInline: $("tokenInline"), tokenSave: $("tokenSave"),
     tl: $("tl"), tlEnd: $("tlEnd"), stop: $("stopBtn"), segs: $("segs"), add: $("addBtn"), trash: $("trashBtn"), fmtNote: $("fmtNote"),
     tune: $("tune"), minSong: $("minSong"), gap: $("gap"), sens: $("sens"), autoName: $("autoName"), token: $("auddToken"),
-    toast: $("toast"), toastMsg: $("toastMsg"), undo: $("undoBtn"),
+    toast: $("toast"), toastMsg: $("toastMsg"), undo: $("undoBtn"), fxAllBoost: $("fxAllBoost"), fxAllDenoise: $("fxAllDenoise"),
   };
   const st = { name: "", fileLabel: "", src: null, feat: null, det: null, segs: [], play: null, cursor: 0, busy: false, loadGen: 0, trash: [], zipUrl: "", rec: { gen: 0, cache: [], blocked: "" } };
   const player = new Audio();
@@ -1045,9 +1379,12 @@ const Media = (() => {
     stopPlay(); clearZipLink(); hideToast();
     st.rec.gen++; st.rec.cache = []; st.rec.blocked = "";
     st.src = st.feat = st.det = null; st.segs = []; st.trash = [];
-    st.fileLabel = file.name;
-    st.name = file.name.replace(/\.[^.]+$/, "").replace(/[\\/:*?"<>|]+/g, "_") || "audio";
-    resetWork(); ui.workName.textContent = file.name; workT0 = performance.now();
+    const base = file.name.replace(/\.[^.]+$/, ""), sc = st.shortcutName;
+    const title = sc && base === sc.fixed ? sc.name : base;
+    st.fileLabel = title;
+    st.name = title.replace(/[\\/:*?"<>|]+/g, "_") || "audio";
+    clearTimeout(fxTimer);
+    resetWork(); ui.workName.textContent = title; workT0 = performance.now();
     show("work"); say("노래 찾는 중");
     try {
       let src = await Media.open(file), feat = null;
@@ -1077,6 +1414,13 @@ const Media = (() => {
 
   // ---- detection + result header ----
   function detectOpts() { return { minSong: +ui.minSong.value || A2M.DEFAULTS.minSong, gap: +ui.gap.value || A2M.DEFAULTS.gap, sens: +ui.sens.value || 0 }; }
+  // "모든 곡" switches double as defaults for songs found or added later (kept on this device).
+  const fxDefault = { boost: store.get("a2m.fxBoost") === "1", denoise: store.get("a2m.fxDenoise") === "1" };
+  function newSeg(start, end, open) {
+    const s = { start, end, name: "", nameEdited: false, rec: "", open, boost: fxDefault.boost, denoise: fxDefault.denoise, fxState: "", fxOut: null, fxPct: 0 };
+    if (needFx(s)) s.fxState = "queued";
+    return s;
+  }
   function runDetect({ first = false } = {}) {
     if (!st.feat) return;
     stopPlay(); clearZipLink();
@@ -1087,17 +1431,15 @@ const Media = (() => {
       st.det = A2M.detect(st.feat, detectOpts());
     }
     const dur = st.src.duration;
-    st.segs = st.det.segments.map((s) => ({ start: s.start, end: Math.min(dur, s.end), name: "", nameEdited: false, rec: "", open: false }));
+    // New songs inherit the "모든 곡" switches so re-detection keeps the user's choice.
+    st.segs = st.det.segments.map((s) => newSeg(s.start, Math.min(dur, s.end), false));
     st.trash = [];
-    ui.fmtNote.textContent = st.src.kind === "pcm"
-      ? `WAV로 저장돼요(${st.src.buffer.sampleRate / 1000}kHz${st.src.buffer.sampleRate < 44100 ? ", 긴 파일이라 낮춤" : ""}).`
-      : `원본과 같은 ${st.src.ext.toUpperCase()}로 저장돼요. 다시 인코딩하지 않아 음질 그대로예요.`;
     ui.tlEnd.textContent = fmtShort(dur);
     ui.nameCard.hidden = true;
     renderList(); updateHeader(); draw();
     if (!st.segs.length) ui.tune.open = true;
     say(st.segs.length ? `노래 ${st.segs.length}곡을 찾았어요` : "노래를 찾지 못했어요");
-    recognizeAll();
+    recognizeAll(); scheduleFx(300);
   }
   function updateHeader() {
     const n = st.segs.length, dur = st.src.duration, music = st.segs.reduce((a, s) => a + s.end - s.start, 0);
@@ -1105,8 +1447,17 @@ const Media = (() => {
     ui.resSub.textContent = n
       ? `${st.fileLabel} · ${fmtLong(dur)} 중 노래 ${fmtLong(music)}`
       : `${st.fileLabel} · 대사와 노래가 섞인 녹음이 맞나요? 아래 ‘찾기 조정’에서 ‘노래 더 찾기’ 쪽으로 옮기거나, 타임라인에서 위치를 고른 뒤 ‘직접 추가’를 눌러 보세요.`;
-    ui.saveAll.hidden = !n; ui.saveAll.textContent = n > 1 ? `${n}곡 모두 저장` : "저장";
+    const pending = st.segs.filter(fxPending).length;
+    ui.saveAll.hidden = !n;
+    ui.saveAll.disabled = !!pending;
+    ui.saveAll.textContent = pending ? `다듬는 중… (${n - pending}/${n}곡 끝)` : n > 1 ? `${n}곡 모두 저장` : "저장";
     ui.trash.hidden = !st.trash.length; ui.trash.textContent = `지운 곡 되돌리기 (${st.trash.length})`;
+    const orig = st.src.kind === "pcm"
+      ? `WAV로 저장돼요(${st.src.buffer.sampleRate / 1000}kHz${st.src.buffer.sampleRate < 44100 ? ", 긴 파일이라 낮춤" : ""}).`
+      : `원본과 같은 ${st.src.ext.toUpperCase()}로 저장돼요. 다시 인코딩하지 않아 음질 그대로예요.`;
+    ui.fmtNote.textContent = st.segs.some(needFx)
+      ? `${orig} 소리 키우기·잡음 줄이기를 켠 곡은 새로 만들어 저장해요(m4a, 이 기기에서 m4a를 만들 수 없으면 WAV).`
+      : orig;
   }
 
   // ---- song names via AudD (https://docs.audd.io): one 15 s clip per song, a second window if the
@@ -1185,13 +1536,16 @@ const Media = (() => {
   // ---- list ----
   const canShareFiles = (files) => { try { return !!(navigator.canShare && navigator.canShare({ files })); } catch (_) { return false; } };
   const svg = (d) => `<svg viewBox="0 0 14 14" aria-hidden="true"><path d="${d}"/></svg>`;
-  const ICON_PLAY = svg("M3 1.5v11l9.5-5.5z"), ICON_STOP = svg("M2.5 2.5h9v9h-9z");
+  const ICON_PLAY = svg("M3 1.5v11l9.5-5.5z"), ICON_STOP = svg("M2.5 2.5h9v9h-9z"), ICON_PAUSE = svg("M2.5 1.5h3.2v11H2.5zM8.3 1.5h3.2v11H8.3z");
+  const ICON_DL = svg("M6 1h2v6.6l2.4-2.4 1.4 1.4L7 11.4 2.2 6.6l1.4-1.4L6 7.6zM1.5 12h11v1.6h-11z");
   const REC_TEXT = { pending: ["tag", "이름 찾는 중…"], none: ["", "이름을 못 찾았어요"], error: ["bad", "이름 찾기 실패"], skipped: ["", "이름 찾기 체험 끝"] };
   const label = (s, i) => s.name || `${i + 1}번 곡`;
   function fillMeta(s, i, ttl, len) {
     ttl.textContent = label(s, i);
     len.textContent = `${fmtShort(s.start)}–${fmtShort(s.end)} · ${fmtShort(s.end - s.start)}`;
     if (REC_TEXT[s.rec]) { const t = document.createElement("span"); t.className = REC_TEXT[s.rec][0]; t.textContent = ` · ${REC_TEXT[s.rec][1]}`; len.append(t); }
+    const fx = fxText(s);
+    if (fx) { const t = document.createElement("span"); t.className = fx[0]; t.textContent = ` · ${fx[1]}`; len.append(t); }
   }
   // Updates one row in place (a rebuild would drop focus and the iOS keyboard mid-edit).
   function refreshRow(s) {
@@ -1201,6 +1555,9 @@ const Media = (() => {
     const nameIn = li.querySelector("input.name");
     if (nameIn && document.activeElement !== nameIn && !s.nameEdited) nameIn.value = s.name;
     li.querySelectorAll(".tv").forEach((el) => { el.value = fmt(s[el.dataset.key]); });
+    li.querySelectorAll("input[data-fx]").forEach((el) => { el.checked = !!s[el.dataset.fx]; });
+    const seek = li.querySelector(".seek"), dur = Math.round((s.end - s.start) * 10) / 10;
+    if (seek) { seek.max = String(dur); li.querySelector(".ptot").textContent = fmtShort(dur); }
   }
   function el(tag, props = {}, ...kids) {
     const e = document.createElement(tag);
@@ -1219,8 +1576,9 @@ const Media = (() => {
     t = Math.max(0, Math.min(dur, t));
     if (key === "start") t = Math.min(t, s.end - 1); else t = Math.max(t, s.start + 1);
     s[key] = Math.round(t * 10) / 10;
-    refreshRow(s); clearZipLink(); draw(); updateHeader();
+    refreshRow(s); clearZipLink(); draw();
     if (s.rec !== "ok") { s.rec = s.rec === "pending" ? "pending" : ""; clearTimeout(setTime.timer); setTime.timer = setTimeout(recognizeAll, 1500); }
+    invalidateFx(s); updateHeader(); scheduleFx(1500);
   }
   function renderList() {
     ui.segs.textContent = "";
@@ -1233,8 +1591,18 @@ const Media = (() => {
         el("span", { className: "idx", textContent: String(n), aria: { "aria-hidden": "true" } }),
         el("span", { className: "meta" }, ttl, len),
         el("span", { className: "chev", aria: { "aria-hidden": "true" } }));
-      const play = el("button", { type: "button", className: "play", innerHTML: ICON_PLAY, aria: { "aria-label": `${n}번 곡 미리듣기` } });
-      play.onclick = () => (st.play && st.play.idx === i) ? stopPlay() : playFrom(s.start, s.end, i);
+      const dl = el("button", { type: "button", className: "dl", innerHTML: ICON_DL, aria: { "aria-label": `${n}번 곡 다운로드` } });
+      dl.onclick = () => saveOne(i);
+      const play = el("button", { type: "button", className: "play", innerHTML: ICON_PLAY, aria: { "aria-label": `${n}번 곡 재생` } });
+      play.onclick = () => toggleSong(i);
+
+      // Per-song player: only shown for the song that is playing or paused.
+      const seek = el("input", { type: "range", className: "seek", min: "0", max: String(Math.round((s.end - s.start) * 10) / 10), step: "0.1", value: "0", aria: { "aria-label": `${n}번 곡 재생 위치` } });
+      seek.oninput = () => { if (isSong(i)) { player.currentTime = +seek.value; updatePlayer(); } };
+      const pbar = el("div", { className: "pbar", hidden: true },
+        btn("−10초", `${n}번 곡 10초 뒤로`, () => skip(i, -10), "sm"),
+        el("div", { className: "seekwrap" }, seek, el("div", { className: "ptime" }, el("span", { className: "pcur", textContent: "0:00" }), el("span", { className: "ptot", textContent: fmtShort(s.end - s.start) }))),
+        btn("+10초", `${n}번 곡 10초 앞으로`, () => skip(i, 10), "sm"));
 
       const edit = el("div", { className: "edit", id: `edit-${n}`, hidden: !s.open });
       row.onclick = () => { s.open = !s.open; edit.hidden = !s.open; row.setAttribute("aria-expanded", String(s.open)); };
@@ -1253,14 +1621,22 @@ const Media = (() => {
           el("div", { className: "trow" }, nudge(-5), nudge(-1), nudge(1), nudge(5),
             btn("지금 위치로", `${n}번 곡 ${lbl}을 재생 위치로`, () => setTime(s, key, curTime()))));
       };
-      const acts = el("div", { className: "acts" }, btn("이 곡 저장", `${n}번 곡 저장`, () => saveOne(i)));
+      const fxSwitch = (key, text) => {
+        const sw = el("input", { type: "checkbox", className: "switch", checked: !!s[key], aria: { role: "switch", "aria-label": `${n}번 곡 ${text}` } });
+        sw.dataset.fx = key;
+        sw.onchange = () => setFx([s], key, sw.checked);
+        return el("label", { className: "fxrow" }, el("span", { textContent: text }), sw);
+      };
+      const acts = el("div", { className: "acts" });
       if (sharing) acts.append(btn("공유", `${n}번 곡 공유`, () => shareOne(i)));
       acts.append(btn("삭제", `${n}번 곡 삭제`, () => removeSeg(i), "danger"));
-      edit.append(el("label", { className: "f" }, "이름", nameIn), timeRow("시작", "start"), timeRow("끝", "end"), acts);
-      li.append(row, play, edit);
+      edit.append(el("label", { className: "f" }, "이름", nameIn),
+        el("div", { className: "fxbox" }, fxSwitch("boost", "노래 소리 키우기"), fxSwitch("denoise", "잡음 줄이기")),
+        timeRow("시작", "start"), timeRow("끝", "end"), acts);
+      li.append(row, el("div", { className: "rbtns" }, dl, play), pbar, edit);
       ui.segs.append(li);
     });
-    markPlaying();
+    markPlaying(); syncFxAll();
   }
   function removeSeg(i) {
     if (st.play && st.play.idx != null) stopPlay();
@@ -1279,7 +1655,8 @@ const Media = (() => {
   function addSeg() {
     if (!st.src) return;
     const dur = st.src.duration, start = Math.min(st.cursor, Math.max(0, dur - 1));
-    const s = { start, end: Math.min(dur, start + 180), name: "", nameEdited: false, rec: "", open: true };
+    const s = newSeg(start, Math.min(dur, start + 180), true);
+    scheduleFx(1500);
     st.segs.push(s); st.segs.sort((a, b) => a.start - b.start);
     clearZipLink(); renderList(); draw(); updateHeader();
     const li = ui.segs.children[st.segs.indexOf(s)];
@@ -1343,17 +1720,49 @@ const Media = (() => {
 
   // ---- playback through <audio>: plays with the iPhone silent switch on, and the clip is built
   // synchronously so play() stays inside the tap gesture.
+  // st.play = { idx, url, base (recording time of the file's t=0), end, song (full-song player) }
   function curTime() { return st.play ? Math.min(st.play.end, st.play.base + player.currentTime) : st.cursor; }
-  function playFrom(t0, t1, idx) {
+  function startPlayback(blob, base, end, idx, song, offset = 0) {
     stopPlay();
-    const c = st.src.cut(t0, t1), url = URL.createObjectURL(c.blob);
-    st.play = { base: c.t0, end: c.t1, idx, url };
+    const url = URL.createObjectURL(blob);
+    st.play = { base, end, idx, url, song };
     player.src = url;
+    if (offset > 0) player.addEventListener("loadedmetadata", () => { player.currentTime = offset; }, { once: true });
     player.onended = () => { if (st.play && st.play.url === url) stopPlay(); };
     player.play().catch(() => { if (st.play && st.play.url === url) { stopPlay(); toast("재생이 막혔어요. 한 번 더 눌러 주세요."); } });
     markPlaying();
-    const loop = () => { if (!st.play || st.play.url !== url) return; draw(); requestAnimationFrame(loop); };
+    const loop = () => { if (!st.play || st.play.url !== url) return; draw(); updatePlayer(); requestAnimationFrame(loop); };
     requestAnimationFrame(loop);
+  }
+  // Short clips (timeline, "처음 듣기", "끝 10초") always play the original recording.
+  function playFrom(t0, t1, idx) {
+    const c = st.src.cut(t0, t1);
+    startPlayback(c.blob, c.t0, c.t1, idx, false);
+  }
+  // Full-song player: plays the cleaned-up version once it's ready, otherwise the original.
+  function playSong(i, offset = 0) {
+    const s = st.segs[i];
+    if (fxReady(s)) startPlayback(s.fxOut.blob, s.start, s.end, i, true, offset);
+    else { const c = st.src.cut(s.start, s.end); startPlayback(c.blob, c.t0, c.t1, i, true, offset); }
+  }
+  const isSong = (i) => !!(st.play && st.play.song && st.play.idx === i);
+  function toggleSong(i) {
+    if (!isSong(i)) { playSong(i); return; }
+    if (player.paused) player.play().catch(() => {}); else player.pause();
+  }
+  function skip(i, d) {
+    if (!isSong(i)) { playSong(i, Math.max(0, d)); return; }
+    const max = st.segs[i].end - st.segs[i].start;
+    player.currentTime = Math.max(0, Math.min(max - 0.1, player.currentTime + d));
+    updatePlayer();
+  }
+  function updatePlayer() {
+    if (!st.play || !st.play.song) return;
+    const li = ui.segs.children[st.play.idx];
+    if (!li) return;
+    const seek = li.querySelector(".seek"), t = player.currentTime || 0;
+    if (document.activeElement !== seek) seek.value = String(t);
+    li.querySelector(".pcur").textContent = fmtShort(t);
   }
   function stopPlay() {
     const was = st.play;
@@ -1364,43 +1773,139 @@ const Media = (() => {
   function markPlaying() {
     ui.stop.hidden = !st.play;
     [...ui.segs.children].forEach((li, i) => {
-      const on = !!(st.play && st.play.idx === i), b = li.querySelector("button.play");
-      li.classList.toggle("playing", on);
-      b.innerHTML = on ? ICON_STOP : ICON_PLAY;
-      b.setAttribute("aria-label", `${i + 1}번 곡 ${on ? "정지" : "미리듣기"}`);
+      const on = !!(st.play && st.play.idx === i), song = isSong(i), running = on && !player.paused;
+      const b = li.querySelector("button.play");
+      li.classList.toggle("playing", running);
+      b.innerHTML = song ? (running ? ICON_PAUSE : ICON_PLAY) : on ? ICON_STOP : ICON_PLAY;
+      b.setAttribute("aria-label", `${i + 1}번 곡 ${song ? (running ? "일시정지" : "이어서 재생") : on ? "정지" : "재생"}`);
+      li.querySelector(".pbar").hidden = !song;
     });
+    updatePlayer();
+  }
+  player.addEventListener("play", markPlaying);
+  player.addEventListener("pause", markPlaying);
+  player.addEventListener("timeupdate", updatePlayer);
+
+  // ---- 노래 소리 키우기 / 잡음 줄이기: processed in the background, one song at a time, as soon as a
+  // switch is turned on, so saving later is a single tap (iOS only allows downloads/share inside a tap).
+  const needFx = (s) => !!(s.boost || s.denoise);
+  const fxKey = (s) => `${s.start}|${s.end}|${s.boost ? 1 : 0}${s.denoise ? 1 : 0}`;
+  const fxReady = (s) => needFx(s) && s.fxState === "ready" && s.fxOut && s.fxDone === fxKey(s);
+  const fxPending = (s) => needFx(s) && !fxReady(s) && s.fxState !== "error";
+  function fxText(s) {
+    if (!needFx(s)) return null;
+    const what = [s.boost && "소리 키움", s.denoise && "잡음 줄임"].filter(Boolean).join("·");
+    if (fxReady(s)) return ["ok", `${what} ✓`];
+    if (s.fxState === "error") return ["bad", "다듬기 실패 · 원본으로 저장돼요"];
+    if (s.fxState === "working") return ["tag", `다듬는 중 ${Math.floor((s.fxPct || 0) * 100)}%`];
+    return ["tag", "다듬기 대기"];
+  }
+  function invalidateFx(s) {
+    if (!needFx(s)) { s.fxState = ""; s.fxOut = null; return; }
+    if (fxReady(s)) return;
+    s.fxOut = null; s.fxPct = 0; // stale result for other bounds/settings
+    if (s.fxState !== "working") s.fxState = "queued";
+  }
+  function setFx(list, key, on) {
+    for (const s of list) { s[key] = on; invalidateFx(s); refreshRow(s); }
+    clearZipLink(); syncFxAll(); updateHeader(); scheduleFx(300);
+  }
+  function syncFxAll() {
+    const n = st.segs.length;
+    ui.fxAllBoost.checked = !!n && st.segs.every((s) => s.boost);
+    ui.fxAllDenoise.checked = !!n && st.segs.every((s) => s.denoise);
+  }
+  let fxBusy = false, fxTimer = 0;
+  function scheduleFx(delay) { clearTimeout(fxTimer); fxTimer = setTimeout(runFx, delay); }
+  async function runFx() {
+    if (fxBusy || !st.src) return;
+    fxBusy = true; wake(true);
+    const src = st.src;
+    try {
+      for (;;) {
+        const s = st.segs.find((x) => fxPending(x) && x.fxState !== "working");
+        if (!s || st.src !== src) break;
+        const k = fxKey(s);
+        s.fxState = "working"; s.fxPct = 0; refreshRow(s); updateHeader();
+        let out = null, failed = false;
+        try {
+          out = await processSong(s, (p) => { s.fxPct = p; refreshRow(s); });
+        } catch (_) { failed = true; }
+        if (st.src !== src) break;
+        if (fxKey(s) !== k) s.fxState = needFx(s) ? "queued" : ""; // changed while working: redo
+        else if (failed) s.fxState = "error";
+        else { s.fxOut = out; s.fxDone = k; s.fxState = "ready"; }
+        refreshRow(s); updateHeader(); clearZipLink();
+      }
+    } finally { fxBusy = false; wake(st.busy); updateHeader(); }
+  }
+  async function processSong(s, onP) {
+    const src = st.src;
+    let channels, sr;
+    if (src.kind === "pcm") {
+      const b = src.buffer, a = Math.floor(s.start * b.sampleRate), e = Math.min(b.length, Math.ceil(s.end * b.sampleRate));
+      sr = b.sampleRate;
+      channels = Array.from({ length: b.numberOfChannels }, (_, c) => b.getChannelData(c).slice(a, e));
+    } else {
+      sr = src.sampleRate || 48000;
+      const c = src.cut(s.start, s.end);
+      const buf = await new OfflineAudioContext(1, 1, sr).decodeAudioData(await c.blob.arrayBuffer());
+      // Same alignment as Media.decodeMono: the cut may start up to one frame early and decoders may
+      // add priming samples at the front, so align on the known end.
+      const want = Math.round((c.t1 - c.t0) * sr), len = Math.round((s.end - s.start) * sr);
+      const skipN = Math.round((s.start - c.t0) * sr) + Math.max(0, buf.length - want);
+      channels = Array.from({ length: buf.numberOfChannels }, (_, k) => buf.getChannelData(k).slice(Math.min(buf.length, skipN), Math.min(buf.length, skipN + len)));
+    }
+    onP(0.05);
+    const out = await FX.render({ channels, sampleRate: sr }, { boost: !!s.boost, denoise: !!s.denoise }, (p) => onP(0.05 + p * 0.85));
+    const enc = await FX.encode(out, sr);
+    onP(1);
+    return enc; // { blob, ext, mime }
   }
 
   // ---- saving ----
   const safe = (x) => x.replace(/[\\/:*?"<>|\u0000-\u001f]+/g, "_").replace(/^[.\s]+|[.\s]+$/g, "").slice(0, 120);
-  function fileName(i) {
+  function fileName(i, ext = st.src.ext) {
     const s = st.segs[i], n = safe(s.name || "");
-    return n ? `${pad(i + 1, 2)} ${n}.${st.src.ext}` : `${st.name} ${pad(i + 1, 2)}번 곡.${st.src.ext}`;
+    return n ? `${pad(i + 1, 2)} ${n}.${ext}` : `${st.name} ${pad(i + 1, 2)}번 곡.${ext}`;
   }
-  const songFile = (i) => new File([st.src.cut(st.segs[i].start, st.segs[i].end).blob], fileName(i), { type: st.src.mime });
+  // The file to save for song i: cleaned-up version when ready, original otherwise; null while processing.
+  function outFile(i) {
+    const s = st.segs[i];
+    if (fxPending(s)) return null;
+    if (fxReady(s)) return new File([s.fxOut.blob], fileName(i, s.fxOut.ext), { type: s.fxOut.mime });
+    return new File([st.src.cut(s.start, s.end).blob], fileName(i), { type: st.src.mime });
+  }
+  const WHERE = IOS ? "파일 앱 › 다운로드" : "다운로드 폴더";
   function download(blob, name) {
     const url = URL.createObjectURL(blob), a = document.createElement("a");
     a.href = url; a.download = name; document.body.append(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 5 * 60000); // mobile browsers may start the transfer late
   }
+  function notReady(i) {
+    const s = st.segs[i];
+    toast(`${label(s, i)}은 아직 다듬는 중이에요 (${Math.floor((s.fxPct || 0) * 100)}%). 끝나면 다시 눌러 주세요.`);
+  }
   function saveOne(i) {
-    const f = songFile(i);
+    const f = outFile(i);
+    if (!f) { notReady(i); return; }
     download(f, f.name);
-    toast(IOS ? `${label(st.segs[i], i)} 저장 · 파일 앱 › 다운로드` : `${label(st.segs[i], i)} 저장했어요`);
+    toast(`${label(st.segs[i], i)} 저장 · ${WHERE}`);
   }
   function shareOne(i) {
-    const f = songFile(i);
+    const f = outFile(i);
+    if (!f) { notReady(i); return; }
     navigator.share({ files: [f], title: f.name }).catch((e) => { if (e && e.name !== "AbortError") download(f, f.name); });
   }
   // iPhone/Android: everything at once through the share sheet ("파일에 저장" saves them all).
   // Too many/too big for the share sheet, or desktop: one ZIP.
   function saveAll() {
     const n = st.segs.length;
-    if (!n) return;
+    if (!n || st.segs.some(fxPending)) return;
     if (MOBILE) {
-      const files = st.segs.map((_, i) => songFile(i)), bytes = files.reduce((a, f) => a + f.size, 0);
+      const files = st.segs.map((_, i) => outFile(i)), bytes = files.reduce((a, f) => a + f.size, 0);
       if (files.length <= SHARE_MAX_FILES && bytes <= SHARE_MAX_BYTES && canShareFiles(files)) {
-        ui.saveHint.innerHTML = "공유 메뉴에서 <b>파일에 저장</b>을 고르면 한 번에 저장돼요."; ui.saveHint.hidden = false;
+        ui.saveHint.innerHTML = "공유 메뉴에서 <b>파일에 저장</b>을 고르면 원하는 폴더에 한 번에 저장돼요."; ui.saveHint.hidden = false;
         navigator.share({ files, title: `노래 ${n}곡` }).catch((e) => {
           if (e && e.name === "AbortError") return;
           toast("공유 메뉴로 보내지 못했어요. ZIP으로 만들게요."); saveZip();
@@ -1425,7 +1930,7 @@ const Media = (() => {
     const g = zipGen, label0 = ui.saveAll.textContent;
     ui.saveAll.disabled = true; wake(true);
     try {
-      const files = st.segs.map((_, i) => ({ name: fileName(i), blob: st.src.cut(st.segs[i].start, st.segs[i].end).blob }));
+      const files = st.segs.map((_, i) => { const f = outFile(i); return { name: f.name, blob: f }; });
       const blob = await Media.zip(files, (k) => { ui.saveAll.textContent = `ZIP 만드는 중… ${k + 1}/${n}`; });
       if (g !== zipGen) { toast("곡 목록이 바뀌어서 다시 눌러 주세요."); return; }
       st.zipUrl = URL.createObjectURL(blob);
@@ -1435,10 +1940,10 @@ const Media = (() => {
         ui.zipLink.hidden = false;
         ui.saveHint.innerHTML = IOS ? "ZIP 받기를 누르면 파일 앱 › 다운로드에 저장돼요. ZIP을 한 번 누르면 풀려요." : "ZIP 받기를 눌러 저장하세요.";
         ui.saveHint.hidden = false; say("ZIP이 준비됐어요. ZIP 받기를 누르세요.");
-      } else { ui.zipLink.click(); toast(`${n}곡을 ZIP으로 저장했어요`); }
+      } else { ui.zipLink.click(); toast(`${n}곡을 ZIP으로 저장했어요 · ${WHERE}`); }
     } catch (_) {
       toast("ZIP을 만들지 못했어요. 곡을 하나씩 저장해 주세요.");
-    } finally { ui.saveAll.textContent = label0; ui.saveAll.disabled = false; wake(false); }
+    } finally { ui.saveAll.textContent = label0; ui.saveAll.disabled = false; wake(false); updateHeader(); }
   }
 
   // ---- settings (this device only) ----
@@ -1459,6 +1964,12 @@ const Media = (() => {
   ui.token.addEventListener("change", () => setToken(ui.token.value));
   ui.tokenSave.addEventListener("click", () => { if (ui.tokenInline.value.trim()) setToken(ui.tokenInline.value); else ui.tokenInline.focus(); });
   ui.tokenInline.addEventListener("keydown", (e) => { if (e.key === "Enter") ui.tokenSave.click(); });
+  for (const [sw, key, k] of [[ui.fxAllBoost, "boost", "a2m.fxBoost"], [ui.fxAllDenoise, "denoise", "a2m.fxDenoise"]]) {
+    sw.addEventListener("change", () => {
+      fxDefault[key] = sw.checked; store.set(k, sw.checked ? "1" : "0");
+      setFx(st.segs, key, sw.checked);
+    });
+  }
   ui.autoName.addEventListener("change", () => {
     store.set("a2m.autoName", ui.autoName.checked ? "1" : "0");
     if (ui.autoName.checked) { retryNames(); return; }
@@ -1502,8 +2013,11 @@ const Media = (() => {
   // Arrived from the "노래 가위로 보내기" Shortcut: one big button straight to the picker.
   const qs = new URLSearchParams(location.search);
   if (qs.get("from") === "shortcut") {
-    const banner = $("fromShortcut"), name = qs.get("name");
-    if (name) $("scName").textContent = name;
+    const banner = $("fromShortcut"), name = qs.get("name"), fixed = qs.get("file");
+    if (name) $("scName").textContent = name.replace(/\.[^.]+$/, "");
+    $("scFile").textContent = fixed || (name ? name.replace(/\.[^.]+$/, "") : "녹음"); // older Shortcut kept the title
+    // The Shortcut saves under a fixed file name; label results with the real recording title.
+    if (name && fixed) st.shortcutName = { fixed, name: name.replace(/\.[^.]+$/, "") };
     banner.hidden = false; $("iosCard").hidden = true;
     document.addEventListener("a2m:file", () => { banner.hidden = true; }, { once: true });
   }
